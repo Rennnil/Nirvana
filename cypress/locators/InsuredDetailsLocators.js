@@ -1,7 +1,7 @@
 class InsuredDetailsLocators {
   static dotNumberInput = "input[name='dotNumber']";
   static companyNameInput = "input[name='companyName']";
-  static effectiveDateInput = "input[placeholder='mm/dd/yyyy']";
+  static effectiveDateInput = "div[aria-label='Choose date'] input[type='tel']";
   static powerUnitsInput = "input[data-attr='posthog-power-units']";
   static producerSelect = "div[id='producer-select']";
   static continueButton =
