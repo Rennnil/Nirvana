@@ -9,13 +9,16 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: "https://agents.nirvanatech.com/",
     testIsolation: false,
+    viewportWidth: 1920,
+    viewportHeight: 1080,
+    defaultCommandTimeout: 12000,
     video: true,
     videoCompression: 32,
     videosFolder: "cypress/images-videos/videos",
     screenshotsFolder: "cypress/images-videos/screenshots",
     screenshotOnRunFailure: true,
     retries: {
-      runMode: 2,
+      runMode: 0,
       openMode: 0,
     },
     setupNodeEvents(on, config) {
@@ -58,7 +61,7 @@ module.exports = defineConfig({
         try {
           console.log("Generating Allure report...");
           execSync(
-            "allure generate cypress/report/allure-results --clean -o cypress/report/allure-report",
+            "npx allure generate cypress/report/allure-results --clean -o cypress/report/allure-report",
             { stdio: "inherit" }
           );
           console.log("Allure report generated successfully.");
