@@ -1,5 +1,5 @@
 import DriversLocators from "../locators/DriversLocators";
-import Helpers from "../support/utils/Helpers";
+import Helpers from "../support/Utils/Helpers";
 import { faker } from "@faker-js/faker";
 import DataGenerator from "../support/utils/DataGenerator";
 import BasePage from "./BasePage";

@@ -1,5 +1,5 @@
 import IndicationLocators from "../locators/IndicationLocators";
-import Helpers from "../support/utils/Helpers";
+import Helpers from "../support/Utils/Helpers";
 import BasePage from "./BasePage";
 
 class IndicationPage {

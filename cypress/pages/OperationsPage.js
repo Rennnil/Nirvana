@@ -1,5 +1,6 @@
 import OperationsLocators from "../locators/OperationsLocators";
-import Helpers from "../support/utils/Helpers";
+import Helpers from "../support/Utils/Helpers";
+
 
 class OperationsPage {
   static verifyOperationsHeadingVisible() {
