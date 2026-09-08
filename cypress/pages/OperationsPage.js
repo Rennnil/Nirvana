@@ -1,13 +1,11 @@
 import OperationsLocators from "../locators/OperationsLocators";
-import Helpers from "../support/Utils/Helpers";
-
+import Helpers from "../support/utils/Helpers";
+import BasePage from "./BasePage";
+import UiAssertions from "../Assertions/UiAssertions";
 
 class OperationsPage {
   static verifyOperationsHeadingVisible() {
-    cy.log("Verifying Operations screen heading is visible");
-    cy.get(OperationsLocators.operationsHeading, { timeout: 10000 })
-      .should("be.visible")
-      .and("contain.text", "Operations");
+    BasePage.verifyVisible(OperationsLocators.operationsHeading, "Operations", 10000);
   }
 
   static verifyDotNumberVisible(dotNumber) {
@@ -16,20 +14,18 @@ class OperationsPage {
     cy.contains("p.MuiTypography-body2", expectedText, { timeout: 10000 })
       .should("be.visible")
       .then(($el) => {
-        const actualText = $el.text().trim();
-        expect(actualText).to.eq(expectedText);
+        UiAssertions.verifyExactText($el, expectedText);
       });
   }
 
   static verifyCompanyNameVisible(expectedCompanyName) {
-  cy.log(`Verifying company name is visible: "${expectedCompanyName}"`);
-  cy.contains("p.MuiTypography-body2", expectedCompanyName, { timeout: 10000 })
-    .should("be.visible")
-    .then(($el) => {
-      const actualText = $el.text().trim();
-      expect(actualText).to.eq(expectedCompanyName);
-    });
-}
+    cy.log(`Verifying company name is visible: "${expectedCompanyName}"`);
+    cy.contains("p.MuiTypography-body2", expectedCompanyName, { timeout: 10000 })
+      .should("be.visible")
+      .then(($el) => {
+        UiAssertions.verifyExactText($el, expectedCompanyName);
+      });
+  }
 
   static verifyOperationsScreen(dotNumber, expectedCompanyName) {
     this.verifyDotNumberVisible(dotNumber);
@@ -39,18 +35,12 @@ class OperationsPage {
 
   static verifyEffectiveDate(expectedDate) {
     cy.log(`Verifying effective date matches: "${expectedDate}"`);
-    cy.get(OperationsLocators.effectiveDateInput)
-      .filter(":visible")
-      .first()
-      .should("have.value", expectedDate);
+    cy.get(OperationsLocators.effectiveDateInput).filter(":visible").first().should("have.value", expectedDate);
   }
 
   static verifyProducer(expectedProducer) {
     cy.log(`Verifying producer matches: "${expectedProducer}"`);
-    cy.get(OperationsLocators.producerSelect)
-      .filter(":visible")
-      .first()
-      .should("contain.text", expectedProducer);
+    cy.get(OperationsLocators.producerSelect).filter(":visible").first().should("contain.text", expectedProducer);
   }
 
   static toggleCoverageCheckbox(coverageName) {
@@ -77,16 +67,8 @@ class OperationsPage {
   }
 
   static enterBusinessOwnerName(firstName, lastName) {
-    cy.log(`Entering business owner name: ${firstName} ${lastName}`);
-    cy.get(OperationsLocators.businessOwnerFirstNameInput)
-      .should("be.visible")
-      .clear()
-      .type(firstName);
-
-    cy.get(OperationsLocators.businessOwnerLastNameInput)
-      .should("be.visible")
-      .clear()
-      .type(lastName);
+    BasePage.typeInto(OperationsLocators.businessOwnerFirstNameInput, firstName, { blur: false });
+    BasePage.typeInto(OperationsLocators.businessOwnerLastNameInput, lastName, { blur: false });
   }
 
   static enterDateOfBirth(dobString) {
@@ -114,14 +96,7 @@ class OperationsPage {
   }
 
   static enterCity(cityName) {
-    cy.log(`Entering city: "${cityName}"`);
-    cy.get(OperationsLocators.businessOwnerCityInput)
-      .should("be.visible")
-      .clear()
-      .type(cityName)
-      .blur();
-
-    cy.get(OperationsLocators.businessOwnerCityInput).should("have.value", cityName);
+    BasePage.typeAndVerify(OperationsLocators.businessOwnerCityInput, cityName);
   }
 
   static selectState(stateName) {
@@ -205,14 +180,7 @@ class OperationsPage {
   }
 
   static enterAllClaims(count) {
-    cy.log(`Entering All Claims count: ${count}`);
-    cy.get(OperationsLocators.allClaimsInput)
-      .should("be.visible")
-      .clear()
-      .type(String(count))
-      .blur();
-
-    cy.get(OperationsLocators.allClaimsInput).should("have.value", String(count));
+    BasePage.typeAndVerify(OperationsLocators.allClaimsInput, count);
   }
 
   static enterPrimaryOperatingClassAndSelectFirst(searchText) {
@@ -263,15 +231,15 @@ class OperationsPage {
 
   static clickProceed() {
     cy.log("Clicking Proceed button");
-    cy.get(OperationsLocators.proceedButton).should("be.visible").click();
+    BasePage.clickVisible(OperationsLocators.proceedButton);
   }
 
   static verifyProceedBlockedWithoutData() {
     this.clickProceed();
     cy.log("Verifying app did NOT navigate away from Operations screen");
     this.verifyOperationsHeadingVisible();
-    cy.url().should("include", "/non-fleet/application");
-    cy.url().should("not.include", "/equipment");
+    UiAssertions.verifyUrlIncludes("/non-fleet/application");
+    UiAssertions.verifyUrlNotIncludes("/equipment");
   }
 
   static fillOperationsForm({
@@ -309,6 +277,41 @@ class OperationsPage {
       .then(() => {
         return capturedOperatingClass;
       });
+  }
+
+  static handleSsnPopupIfPresent(timeout = 8000) {
+    cy.get("body", { timeout }).should(($body) => {
+      const popupExists = $body.find(OperationsLocators.ssnPopupDialog).length > 0;
+
+      const headingText = $body
+        .find(OperationsLocators.operationsHeading)
+        .first()
+        .text()
+        .trim();
+
+      const navigatedAway = headingText !== "" && headingText !== "Operations";
+
+      expect(
+        popupExists || navigatedAway,
+        "popup shown or navigated away from Operations screen"
+      ).to.be.true;
+    });
+
+    cy.get("body").then(($body) => {
+      const popupExists = $body.find(OperationsLocators.ssnPopupDialog).length > 0;
+
+      if (popupExists) {
+        cy.log("SSN popup appeared — clicking Skip");
+        cy.get(OperationsLocators.ssnPopupDialog)
+          .should("be.visible")
+          .within(() => {
+            cy.contains("button", "Skip").should("be.visible").click();
+          });
+        cy.get(OperationsLocators.ssnPopupDialog).should("not.exist");
+      } else {
+        cy.log("SSN popup did not appear — continuing");
+      }
+    });
   }
 }
 

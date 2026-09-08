@@ -19,6 +19,24 @@ class DriversLocators {
   static cdlExpYearsInputInRow = "input[placeholder='e.g. 10']";
 
   static proceedButtonText = "Proceed";
+
+
+  // Upload flow
+static uploadDriverListButton = "button:contains('Upload Driver List')";
+
+// Popup 1 — instructions dialog (scoped by heading text)
+static uploadInstructionsHeading = "Upload Drivers List";
+static useFirstAndLastNameOption = "Use First and Last Name";
+static uploadInstructionsProceedButton = "button:contains('Proceed')";
+
+// Popup 2 — file upload dialog (scoped by heading text)
+static fileUploadDialogHeading = "Drivers List";
+static fileInput = "#agents-nonfleet-drivers-list-file-input";
+static reviewAndConfirmButton = "button:contains('Review & Confirm')";
+
+// Popup 3 — confirm import dialog (scoped by heading text)
+static confirmImportHeading = "Confirm Import";
+static confirmImportSubmitButton = "[data-testid='agents-nonfleet-drivers-list-confirm-import-submit']";
 }
 
 export default DriversLocators;

@@ -1,4 +1,5 @@
 import LoginLocators from "../locators/LoginLocators";
+import BasePage from "./BasePage";
 
 class LoginPage {
   static visit() {
@@ -6,22 +7,15 @@ class LoginPage {
   }
 
   static verifyLoginHeadingVisible() {
-    cy.get(LoginLocators.loginHeading, { timeout: 15000 })
-      .should("be.visible")
-      .and("contain.text", "Sign in to Nirvana");
+    BasePage.verifyVisible(LoginLocators.loginHeading, "Sign in to Nirvana", 15000);
   }
 
   static enterEmail(email) {
-    cy.log(`Entering email: ${email}`);
-    cy.get(LoginLocators.emailInput, { timeout: 10000 })
-      .should("be.visible")
-      .clear()
-      .type(email);
+    BasePage.typeInto(LoginLocators.emailInput, email, { blur: false });
   }
 
   static clickContinueButton() {
-    cy.log("Clicking Continue button");
-    cy.get(LoginLocators.continueButton).should("be.enabled").click();
+    BasePage.clickVisible(LoginLocators.continueButton, { mustBeEnabled: true });
   }
 
   static enterPassword(password) {
@@ -35,8 +29,6 @@ class LoginPage {
   static login(email, password) {
     this.enterEmail(email);
     this.clickContinueButton();
-
-    // Step 2: password field appears on a new screen after email submission
     this.enterPassword(password);
     this.clickContinueButton();
   }

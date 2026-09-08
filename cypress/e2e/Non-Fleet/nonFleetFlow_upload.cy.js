@@ -9,15 +9,13 @@ import IndicationPage from "../../pages/IndicationPage";
 import ReviewPage from "../../pages/ReviewPage";
 import TestData from "../../testData/TestData";
 
-describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
+describe("Nirvana Agent Portal - Non-Fleet Flow (Upload)", () => {
   const email = Cypress.env("agentEmail");
   const password = Cypress.env("agentPassword");
   const expectedName = Cypress.env("agentName");
   const category = TestData.nonFleet.category;
 
   let operationsData = {};
-  let equipmentVins = [];
-  let driversCdlNumbers = [];
   let selectedOperatingClass = "";
   let selectedPlanName = "";
 
@@ -37,24 +35,24 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
     cy.loginIfNeeded(email, password, expectedName);
   });
 
-  it("TC01: display dashboard with agent name after login", { tags: "@NonFleet" }, () => {
+  it("TC01: display dashboard with agent name after login", { tags: "@UploadFlow" }, () => {
     DashboardPage.verifyAgentNameVisible(expectedName);
   });
 
-  it("TC02: select Non-Fleet category from dropdown", { tags: "@NonFleet" }, () => {
+  it("TC02: select Non-Fleet category from dropdown", { tags: "@UploadFlow" }, () => {
     DashboardPage.selectCategory(category);
   });
 
-  it("TC03: verify New Application button is visible and click it", { tags: "@NonFleet" }, () => {
+  it("TC03: verify New Application button is visible and click it", { tags: "@UploadFlow" }, () => {
     DashboardPage.verifyNewApplicationButtonVisible();
     DashboardPage.clickNewApplicationButton();
   });
 
-  it("TC04: verify popup text after clicking New Application", { tags: "@NonFleet" }, () => {
+  it("TC04: verify popup text after clicking New Application", { tags: "@UploadFlow" }, () => {
     InsuredDetailsPage.verifyPopupVisible(TestData.nonFleet.popupText);
   });
 
-  it("TC05: fill insured details and continue", () => {
+  it("TC05: fill insured details and continue", { tags: "@UploadFlow" }, () => {
     InsuredDetailsPage.fillInsuredDetails(insuredDetails).then((companyName) => {
       fetchedCompanyName = companyName;
       cy.log(`Captured company name for later verification: "${companyName}"`);
@@ -62,7 +60,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
     InsuredDetailsPage.clickContinue();
   });
 
-  it("TC06: select 'No' on the follow-up popup", { tags: "@NonFleet" }, () => {
+  it("TC06: select 'No' on the follow-up popup", { tags: "@UploadFlow" }, () => {
     InsuredDetailsPage.clickNoOption();
   });
 
@@ -77,7 +75,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
     OperationsPage.verifyProceedBlockedWithoutData();
   });
 
-  it("TC09: verify prefilled data and fill Operations form completely", { tags: "@NonFleet" }, () => {
+  it("TC09: verify prefilled data and fill Operations form completely", { tags: "@UploadFlow" }, () => {
     OperationsPage.verifyEffectiveDate(insuredDetails.effectiveDate);
     OperationsPage.verifyProducer(insuredDetails.producer);
     OperationsPage.verifyCoverageCheckboxState("Auto Liability", true);
@@ -101,41 +99,37 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
     EquipmentPage.verifyProceedBlockedWithoutData();
   });
 
-  it("TC11: fill all 5 equipment rows and proceed", { tags: "@NonFleet" }, () => {
-    cy.fixture("equipmentVinData").then((vinData) => {
-      equipmentVins = vinData.vinNumbers;
-      EquipmentPage.fillAllEquipmentRowsAndProceed(vinData.vinNumbers, TestData.nonFleet.equipmentStatedValue);
-    });
+  it("TC11: upload equipment list via file, select class/GVW for all rows, and proceed", { tags: "@UploadFlow" }, () => {
+    EquipmentPage.uploadEquipmentListAndProceed(
+      TestData.nonFleet.upload.equipmentFilePath,
+      TestData.nonFleet.upload.equipmentRowCount
+    );
   });
 
   it("TC12: should NOT proceed without filling Drivers details and show 'Please enter DL number' error", () => {
     DriversPage.verifyProceedBlockedWithoutData();
   });
 
-  it("TC13: fill all driver rows and proceed", { tags: "@NonFleet" }, () => {
-    cy.fixture("driversCdlData").then((cdlData) => {
-      driversCdlNumbers = cdlData.drivers.map((d) => d.cdlNumber);
-      DriversPage.fillAllDriverRowsAndProceed(
-        cdlData.drivers,
-        () => DataGenerator.getRandomDobForDriver(),
-        () => DataGenerator.getRandomDateOfHire(),
-      );
-    });
+  it("TC13: upload drivers list via file and proceed", { tags: "@UploadFlow" }, () => {
+    DriversPage.uploadDriverListAndProceed(
+      TestData.nonFleet.upload.driversFilePath,
+      TestData.nonFleet.upload.driversRowCount
+    );
   });
 
-  it("TC14: should NOT proceed without connecting telematics and show error", { tags: "@NonFleet" }, () => {
+  it("TC14: should NOT proceed without connecting telematics and show error", { tags: "@UploadFlow" }, () => {
     IndicationPage.verifyIndicationHeadingVisible();
     IndicationPage.verifyProceedBlockedWithoutTelematics();
   });
 
-  it("TC15: verify default Deductible and Limits values", { tags: "@NonFleet" }, () => {
+  it("TC15: verify default Deductible and Limits values", { tags: "@UploadFlow" }, () => {
     IndicationPage.verifyDefaultDeductibleAndLimits(
       TestData.nonFleet.indication.defaultDeductible,
       TestData.nonFleet.indication.defaultLimits
     );
   });
 
-  it("TC16: update Deductible/Limits, connect telematics, select plan, and proceed", { tags: "@NonFleet" }, () => {
+  it("TC16: update Deductible/Limits, connect telematics, select plan, and proceed", { tags: "@UploadFlow" }, () => {
     IndicationPage.completeIndicationScreen(TestData.nonFleet.indication).then((capturedPlan) => {
       selectedPlanName = capturedPlan;
       cy.log(`Captured selected plan: "${selectedPlanName}"`);
@@ -146,7 +140,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
     ReviewPage.verifyReviewHeadingVisible();
   });
 
-  it("TC18: verify all entered details and submit application", { tags: "@NonFleet" }, () => {
+  it("TC18: verify all entered details and submit application", { tags: "@UploadFlow" }, () => {
     ReviewPage.verifyOperationsSection({
       effectiveDate: insuredDetails.effectiveDate,
       producer: insuredDetails.producer,
@@ -156,9 +150,6 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
       allClaims: operationsData.allClaimsCount,
       primaryCommodity: TestData.nonFleet.review.primaryCommodity,
     });
-
-    ReviewPage.verifyEquipmentSection(equipmentVins);
-    ReviewPage.verifyDriversSection(driversCdlNumbers);
 
     ReviewPage.verifyIndicationSection({
       deductibleValue: TestData.nonFleet.indication.deductibleOption,

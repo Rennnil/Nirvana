@@ -1,5 +1,5 @@
 import DashboardLocators from "../locators/DashboardLocators";
-import Helpers from "../support/Utils/Helpers";
+import Helpers from "../support/utils/Helpers";
 import BasePage from "./BasePage";
 
 class DashboardPage {

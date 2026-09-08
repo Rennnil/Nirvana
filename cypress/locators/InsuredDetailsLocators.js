@@ -3,9 +3,12 @@ class InsuredDetailsLocators {
   static companyNameInput = "input[name='companyName']";
   static effectiveDateInput = "div[aria-label='Choose date'] input[type='tel']";
   static powerUnitsInput = "input[data-attr='posthog-power-units']";
+
+  static agencySelect = "div[id='agency-select']";
   static producerSelect = "div[id='producer-select']";
-  static continueButton =
-    "button[data-attr='posthog-create-application-continue']";
+  static marketerSelect = "div[id='marketer-select']";
+
+  static continueButton = "button[data-attr='posthog-create-application-continue']";
 
   static toggleButtonByValue = (value) => `button[value='${value}']`;
 }

@@ -1,40 +1,36 @@
 import DriversLocators from "../locators/DriversLocators";
-import Helpers from "../support/Utils/Helpers";
+import Helpers from "../support/utils/Helpers";
 import { faker } from "@faker-js/faker";
-import DataGenerator from "../support/Utils/DataGenerator";
+import DataGenerator from "../support/utils/DataGenerator";
 import BasePage from "./BasePage";
+import UiAssertions from "../Assertions/UiAssertions";
 
 class DriversPage {
+  // ============================================================
+  // MANUAL ENTRY FLOW
+  // ============================================================
+
   static getRow(rowIndex) {
     return cy.get(DriversLocators.driverRowByIndex(rowIndex));
   }
 
   static enterCdlNumberInRow(rowIndex, cdlNumber) {
     cy.log(`Row ${rowIndex}: entering CDL Number "${cdlNumber}"`);
-    this.getRow(rowIndex)
-      .find(DriversLocators.cdlNumberInputByIndex(rowIndex))
-      .should("be.visible")
-      .clear()
-      .type(cdlNumber)
-      .blur();
+    BasePage.typeInto(
+      this.getRow(rowIndex).find(DriversLocators.cdlNumberInputByIndex(rowIndex)),
+      cdlNumber,
+      { log: false }
+    );
   }
 
   static enterFirstNameInRow(rowIndex, firstName) {
     cy.log(`Row ${rowIndex}: entering First Name "${firstName}"`);
-    cy.get(DriversLocators.firstNameInputByIndex(rowIndex))
-      .should("be.visible")
-      .clear()
-      .type(firstName)
-      .blur();
+    BasePage.typeInto(cy.get(DriversLocators.firstNameInputByIndex(rowIndex)), firstName, { log: false });
   }
 
   static enterLastNameInRow(rowIndex, lastName) {
     cy.log(`Row ${rowIndex}: entering Last Name "${lastName}"`);
-    cy.get(DriversLocators.lastNameInputByIndex(rowIndex))
-      .should("be.visible")
-      .clear()
-      .type(lastName)
-      .blur();
+    BasePage.typeInto(cy.get(DriversLocators.lastNameInputByIndex(rowIndex)), lastName, { log: false });
   }
 
   static selectStateInRow(rowIndex, stateValue) {
@@ -56,24 +52,17 @@ class DriversPage {
 
   static enterDobInRow(rowIndex, dobString) {
     cy.log(`Row ${rowIndex}: entering Date of Birth "${dobString}"`);
-    this.getRow(rowIndex)
-      .find(DriversLocators.dateInputsInRow)
-      .eq(0)
-      .should("be.visible")
-      .clear()
-      .type(dobString)
-      .blur();
+    BasePage.typeInto(this.getRow(rowIndex).find(DriversLocators.dateInputsInRow).eq(0), dobString, { log: false });
   }
 
   static enterDohInRow(rowIndex, dohString) {
     cy.log(`Row ${rowIndex}: entering Date of Hire "${dohString}"`);
-    this.getRow(rowIndex)
-      .find(DriversLocators.dateInputsInRow)
-      .eq(1)
-      .should("be.visible")
-      .clear()
-      .type(dohString)
-      .blur();
+    BasePage.typeInto(this.getRow(rowIndex).find(DriversLocators.dateInputsInRow).eq(1), dohString, { log: false });
+  }
+
+  static enterCdlExpYearsInRow(rowIndex, years) {
+    cy.log(`Row ${rowIndex}: entering Years of CDL Experience "${years}"`);
+    BasePage.typeInto(this.getRow(rowIndex).find(DriversLocators.cdlExpYearsInputInRow), years, { log: false });
   }
 
   static clickAddDriver() {
@@ -86,25 +75,15 @@ class DriversPage {
   }
 
   static verifyProceedBlockedWithoutData() {
-    cy.log("Ensuring CDL Number field is empty before testing validation");
-    cy.get(DriversLocators.cdlNumberInputByIndex(0)).clear().blur();
+  cy.log("Ensuring CDL Number field is empty before testing validation");
 
-    this.clickProceed();
-    cy.log(`Verifying error message: "${DriversLocators.dlNumberErrorText}"`);
-    cy.contains(DriversLocators.errorHelperText, DriversLocators.dlNumberErrorText, {
-      timeout: 10000,
-    }).should("be.visible");
-  }
+  cy.get(DriversLocators.cdlNumberInputByIndex(0)).should("be.visible");
+  cy.get(DriversLocators.cdlNumberInputByIndex(0)).clear();
+  cy.get(DriversLocators.cdlNumberInputByIndex(0)).blur();
 
-  static enterCdlExpYearsInRow(rowIndex, years) {
-    cy.log(`Row ${rowIndex}: entering Years of CDL Experience "${years}"`);
-    this.getRow(rowIndex)
-      .find(DriversLocators.cdlExpYearsInputInRow)
-      .should("be.visible")
-      .clear()
-      .type(String(years))
-      .blur();
-  }
+  this.clickProceed();
+  UiAssertions.verifyErrorMessageVisible(DriversLocators.errorHelperText, DriversLocators.dlNumberErrorText);
+}
 
   static checkMedCertConfirmation() {
     BasePage.checkMuiCheckbox(
@@ -139,6 +118,66 @@ class DriversPage {
       );
     });
 
+    this.checkMedCertConfirmation();
+    this.clickProceed();
+  }
+
+  // ============================================================
+  // FILE UPLOAD FLOW
+  // ============================================================
+
+  static clickUploadDriverListButton() {
+    BasePage.clickButtonByText("Upload Driver List");
+  }
+
+  static selectFirstAndLastNameOption() {
+    cy.log("Selecting 'Use First and Last Name' option");
+    BasePage.clickInDialogByHeading(
+      "h5",
+      DriversLocators.uploadInstructionsHeading,
+      "p",
+      DriversLocators.useFirstAndLastNameOption
+    );
+  }
+
+  static proceedFromInstructionsPopup() {
+    cy.log("Handling upload-instructions popup — clicking Proceed");
+    BasePage.clickButtonInDialogByHeading("h5", DriversLocators.uploadInstructionsHeading, "Proceed");
+  }
+
+  static attachDriversFile(filePath) {
+    BasePage.attachFileInDialog(
+      "h2",
+      DriversLocators.fileUploadDialogHeading,
+      DriversLocators.fileInput,
+      filePath
+    );
+  }
+
+  static clickReviewAndConfirm() {
+    BasePage.clickButtonByText("Review & Confirm", { mustBeEnabled: true });
+  }
+
+  static confirmImport() {
+    BasePage.confirmImportPopup(
+      "h2",
+      DriversLocators.confirmImportHeading,
+      DriversLocators.confirmImportSubmitButton
+    );
+  }
+
+  static uploadDriverListFile(filePath) {
+    this.clickUploadDriverListButton();
+    this.selectFirstAndLastNameOption();
+    this.proceedFromInstructionsPopup();
+    this.attachDriversFile(filePath);
+    this.clickReviewAndConfirm();
+    this.confirmImport();
+  }
+
+  static uploadDriverListAndProceed(filePath, rowCount) {
+    this.uploadDriverListFile(filePath);
+    cy.get(DriversLocators.driverRowByIndex(rowCount - 1), { timeout: 15000 }).should("exist");
     this.checkMedCertConfirmation();
     this.clickProceed();
   }

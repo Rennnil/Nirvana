@@ -41,4 +41,25 @@ Cypress.Commands.add("loginIfNeeded", (email, password, expectedName) => {
   DashboardPage.verifyAgentNameVisible(expectedName);
 });
 
+
+Cypress.Commands.add("getAuthToken", () => {
+  cy.intercept("GET", "**/me").as("meCall");
+
+  cy.window().then((win) => {
+    win.location.reload();
+  });
+
+  return cy.wait("@meCall").then((interception) => {
+    const token = interception.request.headers["clerk-authorization"];
+    expect(token, "Clerk auth token should be present on /me request").to.exist;
+    return token;
+  });
+});
+
+
+Cypress.Commands.add("interceptAndWait", (method, urlPattern, alias, timeout = 10000) => {
+  cy.intercept(method, urlPattern).as(alias);
+  return () => cy.wait(`@${alias}`, { timeout });
+});
+
 export default LoginPage;

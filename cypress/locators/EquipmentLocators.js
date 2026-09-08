@@ -22,6 +22,23 @@ class EquipmentLocators {
 
   static makeErrorText = "Please enter make";
   static errorHelperText = "p.MuiFormHelperText-root.Mui-error";
+
+
+  // Upload flow
+  static uploadEquipmentListButton = "button:contains('Upload Equipment List')";
+
+  // Popup 1 — instructions dialog (scoped by heading text)
+  static uploadInstructionsHeading = "Upload equipment list";
+  static uploadInstructionsProceedButton = "button:contains('Proceed')";
+
+  // Popup 2 — file upload dialog (scoped by heading text)
+  static fileUploadDialogHeading = "Equipments List";
+  static fileInput = "#agents-nonfleet-equipment-list-file-input";
+  static reviewAndConfirmButton = "button:contains('Review & Confirm')";
+
+  // Popup 3 — confirm import dialog (scoped by heading text)
+  static confirmImportHeading = "Confirm Import";
+  static confirmImportSubmitButton = "[data-testid='agents-nonfleet-equipment-list-confirm-import-submit']";
 }
 
 export default EquipmentLocators;

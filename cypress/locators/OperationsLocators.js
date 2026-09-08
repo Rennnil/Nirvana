@@ -32,6 +32,10 @@ class OperationsLocators {
   static primaryOperatingClassInput = `${OperationsLocators.primaryOperatingClassWrapper} input`;
 
   static primaryCommodityInput = "div.MuiAutocomplete-root input[placeholder='Select']";
+
+  static ssnPopupSkipButton = "button:contains('Skip')";
+  static ssnPopupDialog = "div[role='dialog']";
+  static ssnPopupCloseButton = "button[aria-label='close']";
 }
 
 export default OperationsLocators;

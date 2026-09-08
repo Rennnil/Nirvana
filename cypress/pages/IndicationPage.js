@@ -1,6 +1,7 @@
 import IndicationLocators from "../locators/IndicationLocators";
-import Helpers from "../support/Utils/Helpers";
+import Helpers from "../support/utils/Helpers";
 import BasePage from "./BasePage";
+import UiAssertions from "../Assertions/UiAssertions";
 
 class IndicationPage {
   static verifyIndicationHeadingVisible() {
@@ -20,12 +21,9 @@ class IndicationPage {
   }
 
   static verifyProceedBlockedWithoutTelematics() {
-    this.clickProceed();
-    cy.log(`Verifying error message: "${IndicationLocators.errorTelematicsText}"`);
-    cy.contains(IndicationLocators.errorHelperText, IndicationLocators.errorTelematicsText, {
-      timeout: 10000,
-    }).should("be.visible");
-  }
+  this.clickProceed();
+  UiAssertions.verifyErrorMessageVisible(IndicationLocators.errorHelperText, IndicationLocators.errorTelematicsText);
+}
 
   static verifyDefaultDeductibleValue(expectedValue) {
     BasePage.verifyVisible(IndicationLocators.deductibleSelect, expectedValue);
