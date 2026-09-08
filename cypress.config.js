@@ -49,11 +49,14 @@ module.exports = defineConfig({
         console.log("Allure results/report cleared before run.");
       });
 
+      const fs = require("fs");
+
       on("after:spec", (spec, results) => {
-        if (!results || !results.video || !fs.existsSync(results.video)) return;
-        const resultsDir = path.resolve("cypress/report/allure-results");
-        const videoFileName = `${Date.now()}-attachment.mp4`;
-        fs.copyFileSync(results.video, path.join(resultsDir, videoFileName));
+        if (results?.video && fs.existsSync(results.video)) {
+          fs.copyFileSync(results.video, destinationPath);
+        } else {
+          console.log("Video file not found, skipping copy");
+        }
       });
 
       // Runs once, after ALL specs finish — auto-generates the report
