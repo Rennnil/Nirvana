@@ -5,9 +5,9 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  schedule:
+    schedule:
     - cron: "0 2 * * 1"        # existing weekly Monday run
-    - cron: "30 12 24 9 *"     # one-off: Sept 24, 12:30 UTC = 6:00 PM IST today
+    - cron: "30 14 24 9 *"     # one-off: Sept 24, 14:30 UTC = 8:00 PM IST today
   workflow_dispatch:
     inputs:
       grepTags:
