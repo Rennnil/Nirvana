@@ -101,7 +101,7 @@ jobs:
         if: always()
         run: ls -la cypress/report/allure-report || echo "Report folder missing!"
 
-            - name: Add report link to run summary
+      - name: Add report link to run summary
         if: always()
         run: |
           echo "### 📊 Allure Report" >> $GITHUB_STEP_SUMMARY
