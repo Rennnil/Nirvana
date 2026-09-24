@@ -7,7 +7,7 @@ const { execSync } = require("child_process");
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: "https://agents.staging.nirvanatech.com/",
+    // baseUrl: "https://agents.staging.nirvanatech.com/",
     pageLoadTimeout: 120000,
     testIsolation: false,
     viewportWidth: 1920,

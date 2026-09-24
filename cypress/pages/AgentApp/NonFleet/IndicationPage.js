@@ -1,7 +1,7 @@
-import IndicationLocators from "../locators/IndicationLocators";
-import Helpers from "../support/utils/Helpers";
+import IndicationLocators from "../../../locators/AgentApp/NonFleet/IndicationLocators";
+import Helpers from "../../../support/utils/Helpers";
 import BasePage from "./BasePage";
-import UiAssertions from "../Assertions/UiAssertions";
+import UiAssertions from "../../../Assertions/UiAssertions";
 
 class IndicationPage {
   static verifyIndicationHeadingVisible() {

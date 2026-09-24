@@ -1,7 +1,7 @@
-import OperationsLocators from "../locators/OperationsLocators";
-import Helpers from "../support/utils/Helpers";
+import OperationsLocators from "../../../locators/AgentApp/NonFleet/OperationsLocators";
+import Helpers from "../../../support/utils/Helpers";
 import BasePage from "./BasePage";
-import UiAssertions from "../Assertions/UiAssertions";
+import UiAssertions from "../../../Assertions/UiAssertions";
 
 class OperationsPage {
   static verifyOperationsHeadingVisible() {

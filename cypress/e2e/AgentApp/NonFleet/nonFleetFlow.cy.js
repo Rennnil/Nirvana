@@ -1,18 +1,19 @@
-import LoginPage from "../../pages/LoginPage";
-import DashboardPage from "../../pages/DashboardPage";
-import InsuredDetailsPage from "../../pages/InsuredDetailsPage";
-import DataGenerator from "../../support/utils/DataGenerator";
-import OperationsPage from "../../pages/OperationsPage";
-import EquipmentPage from "../../pages/EquipmentPage";
-import DriversPage from "../../pages/DriversPage";
-import IndicationPage from "../../pages/IndicationPage";
-import ReviewPage from "../../pages/ReviewPage";
-import TestData from "../../testData/TestData";
+import LoginPage from "../../../pages/AgentApp/NonFleet/LoginPage";
+import DashboardPage from "../../../pages/AgentApp/NonFleet/DashboardPage";
+import InsuredDetailsPage from "../../../pages/AgentApp/NonFleet/InsuredDetailsPage";
+import DataGenerator from "../../../support/utils/DataGenerator";
+import OperationsPage from "../../../pages/AgentApp/NonFleet/OperationsPage";
+import EquipmentPage from "../../../pages/AgentApp/NonFleet/EquipmentPage";
+import DriversPage from "../../../pages/AgentApp/NonFleet/DriversPage";
+import IndicationPage from "../../../pages/AgentApp/NonFleet/IndicationPage";
+import ReviewPage from "../../../pages/AgentApp/NonFleet/ReviewPage";
+import TestData from "../../../testData/TestData";
+
 
 describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
   const email = Cypress.env("agentEmail");
   const password = Cypress.env("agentPassword");
-  const expectedName = Cypress.env("agentName");
+  const expectedName = Cypress.env("Super Test");
   const category = TestData.nonFleet.category;
 
   let operationsData = {};
@@ -25,7 +26,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
   let fetchedCompanyName;
 
   before(() => {
-    cy.fixture("nonFleetInsuredData").then((fixtureData) => {
+    cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
       insuredDetails = {
         ...fixtureData,
         effectiveDate: DataGenerator.getCurrentFormattedDate(),
@@ -102,7 +103,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
   });
 
   it("TC11: fill all 5 equipment rows and proceed", { tags: "@NonFleet" }, () => {
-    cy.fixture("equipmentVinData").then((vinData) => {
+    cy.fixture("AgentApp/NonFleet/equipmentVinData").then((vinData) => {
       equipmentVins = vinData.vinNumbers;
       EquipmentPage.fillAllEquipmentRowsAndProceed(vinData.vinNumbers, TestData.nonFleet.equipmentStatedValue);
     });
@@ -113,7 +114,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
   });
 
   it("TC13: fill all driver rows and proceed", { tags: "@NonFleet" }, () => {
-    cy.fixture("driversCdlData").then((cdlData) => {
+    cy.fixture("AgentApp/NonFleet/driversCdlData").then((cdlData) => {
       driversCdlNumbers = cdlData.drivers.map((d) => d.cdlNumber);
       DriversPage.fillAllDriverRowsAndProceed(
         cdlData.drivers,

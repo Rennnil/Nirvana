@@ -1,13 +1,14 @@
-import LoginPage from "../../pages/LoginPage";
-import DashboardPage from "../../pages/DashboardPage";
-import InsuredDetailsPage from "../../pages/InsuredDetailsPage";
-import DataGenerator from "../../support/utils/DataGenerator";
-import OperationsPage from "../../pages/OperationsPage";
-import EquipmentPage from "../../pages/EquipmentPage";
-import DriversPage from "../../pages/DriversPage";
-import IndicationPage from "../../pages/IndicationPage";
-import ReviewPage from "../../pages/ReviewPage";
-import TestData from "../../testData/TestData";
+import LoginPage from "../../../pages/AgentApp/NonFleet/LoginPage";
+import DashboardPage from "../../../pages/AgentApp/NonFleet/DashboardPage";
+import InsuredDetailsPage from "../../../pages/AgentApp/NonFleet/InsuredDetailsPage";
+import DataGenerator from "../../../support/utils/DataGenerator";
+import OperationsPage from "../../../pages/AgentApp/NonFleet/OperationsPage";
+import EquipmentPage from "../../../pages/AgentApp/NonFleet/EquipmentPage";
+import DriversPage from "../../../pages/AgentApp/NonFleet/DriversPage";
+import IndicationPage from "../../../pages/AgentApp/NonFleet/IndicationPage";
+import ReviewPage from "../../../pages/AgentApp/NonFleet/ReviewPage";
+import TestData from "../../../testData/TestData";
+
 
 describe("Nirvana Agent Portal - Non-Fleet Flow (Upload)", () => {
   const email = Cypress.env("agentEmail");
@@ -23,7 +24,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow (Upload)", () => {
   let fetchedCompanyName;
 
   before(() => {
-    cy.fixture("nonFleetInsuredData").then((fixtureData) => {
+    cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
       insuredDetails = {
         ...fixtureData,
         effectiveDate: DataGenerator.getCurrentFormattedDate(),

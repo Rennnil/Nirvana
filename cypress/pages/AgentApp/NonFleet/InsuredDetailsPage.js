@@ -1,6 +1,6 @@
-import InsuredDetailsLocators from "../locators/InsuredDetailsLocators";
-import DashboardLocators from "../locators/DashboardLocators";
-import Helpers from "../support/utils/Helpers";
+import InsuredDetailsLocators from "../../../locators/AgentApp/NonFleet/InsuredDetailsLocators";
+import DashboardLocators from "../../../locators/AgentApp/NonFleet/DashboardLocators";
+import Helpers from "../../../support/utils/Helpers";
 import BasePage from "./BasePage";
 
 class InsuredDetailsPage {

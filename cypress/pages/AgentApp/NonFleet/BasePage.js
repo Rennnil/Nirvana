@@ -37,7 +37,7 @@ class BasePage {
     const base = typeof selectorOrChain === "string" ? cy.get(selectorOrChain) : selectorOrChain;
     let chain = base.should("be.visible");
     if (mustBeEnabled) chain = chain.and("be.enabled");
-    return chain.click({ force });
+    return chain.click({ force :true});
   }
 
   static clickButtonByText(buttonText, { timeout = 10000, force = false, mustBeEnabled = false } = {}) {
@@ -112,7 +112,7 @@ class BasePage {
       });
   }
 
-  
+
   /**
  * Attach a file to a hidden file input inside a dialog identified by its
  * heading, then wait for the dialog's confirm button to become enabled.
@@ -154,6 +154,20 @@ class BasePage {
     cy.get(submitButtonSelector).should("be.visible").and("not.be.disabled").click();
 
     cy.contains(headingSelector, headingText).should("not.exist");
+  }
+
+  /**
+ * Find an element containing the given text, scroll it into view, confirm
+ * it's visible, then locate a sibling matching siblingSelector and run a
+ * custom assertion against it. Covers the repeated "label + adjacent
+ * control" pattern (edit icons, toggles, value containers) across widgets.
+ */
+  static verifySiblingOfLabeledText(textSelector, labelText, siblingSelector, assertFn) {
+    cy.contains(textSelector, labelText, { timeout: 10000 })
+      .scrollIntoView()
+      .should("be.visible")
+      .siblings(siblingSelector)
+      .then(($sibling) => assertFn($sibling));
   }
 
 

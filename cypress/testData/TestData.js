@@ -26,9 +26,9 @@ class TestData {
     },
 
     upload: {
-      equipmentFilePath: "cypress/fixtures/Kishan_Equipment.xlsx",
+      equipmentFilePath: "cypress/fixtures/AgentApp/NonFleet/Kishan_Equipment.xlsx",
       equipmentRowCount: 6,
-      driversFilePath: "cypress/fixtures/Kishan_Drivers.xlsx",
+      driversFilePath: "cypress/fixtures/AgentApp/NonFleet/Kishan_Drivers.xlsx",
       driversRowCount: 15,
     },
 

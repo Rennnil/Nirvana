@@ -1,9 +1,9 @@
-import DriversLocators from "../locators/DriversLocators";
-import Helpers from "../support/utils/Helpers";
+import DriversLocators from "../../../locators/AgentApp/NonFleet/DriversLocators";
+import Helpers from "../../../support/utils/Helpers";
 import { faker } from "@faker-js/faker";
-import DataGenerator from "../support/utils/DataGenerator";
+import DataGenerator from "../../../support/utils/DataGenerator";
 import BasePage from "./BasePage";
-import UiAssertions from "../Assertions/UiAssertions";
+import UiAssertions from "../../../Assertions/UiAssertions";
 
 class DriversPage {
   // ============================================================

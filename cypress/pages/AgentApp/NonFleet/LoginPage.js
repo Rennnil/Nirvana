@@ -1,9 +1,10 @@
-import LoginLocators from "../locators/LoginLocators";
+import LoginLocators from "../../../locators/AgentApp/NonFleet/LoginLocators";
 import BasePage from "./BasePage";
 
 class LoginPage {
+  
   static visit() {
-    cy.visit("/");
+    cy.visit("https://agents.staging.nirvanatech.com/");
   }
 
   static verifyLoginHeadingVisible() {

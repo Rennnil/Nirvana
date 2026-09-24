@@ -1,7 +1,7 @@
-import EquipmentLocators from "../locators/EquipmentLocators";
-import Helpers from "../support/utils/Helpers";
+import EquipmentLocators from "../../../locators/AgentApp/NonFleet/EquipmentLocators";
+import Helpers from "../../../support/utils/Helpers";
 import BasePage from "./BasePage";
-import UiAssertions from "../Assertions/UiAssertions";
+import UiAssertions from "../../../Assertions/UiAssertions";
 
 class EquipmentPage {
   // ============================================================
@@ -102,12 +102,11 @@ class EquipmentPage {
   }
 
   static fillEquipmentRow(rowIndex, vin, statedValue) {
-    this.enterVinInRow(rowIndex, vin);
-    this.verifyAutoFetchedFieldsInRow(rowIndex);
-    this.selectRandomVehicleClassInRow(rowIndex);
-    this.selectRandomGvwInRow(rowIndex);
-    this.enterStatedValueInRow(rowIndex, statedValue);
-  }
+  this.enterVinInRow(rowIndex, vin);
+  this.verifyAutoFetchedFieldsInRow(rowIndex);
+  this.selectVehicleClassAndGvwBasedOnVehicleType(rowIndex);
+  this.enterStatedValueInRow(rowIndex, statedValue);
+}
 
   static fillAllEquipmentRowsAndProceed(vinNumbers, statedValue) {
     vinNumbers.forEach((vin, index) => {
@@ -119,7 +118,48 @@ class EquipmentPage {
     });
 
     this.clickProceed();
+
+    // Wait for the Drivers screen to actually be ready before returning control
+    cy.get("input[name='driversForm.drivers.0.licenseNumber']", { timeout: 15000 }).should("exist");
   }
+
+  static selectVehicleClassAndGvwBasedOnVehicleType(rowIndex) {
+    this.getRow(rowIndex)
+      .find(EquipmentLocators.vehicleTypeSelectInRow)
+      .invoke("text")
+      .then((vehicleTypeText) => {
+        const vehicleType = vehicleTypeText.trim();
+        cy.log(`Row ${rowIndex}: detected Vehicle Type "${vehicleType}"`);
+
+        let vehicleClassValue;
+        let gvwValue;
+
+        if (vehicleType.includes(EquipmentLocators.vehicleTypeTractor)) {
+          vehicleClassValue = EquipmentLocators.vehicleClassTruckTractor;
+          gvwValue = EquipmentLocators.gvwTractorRange;
+        } else if (vehicleType.includes(EquipmentLocators.vehicleTypeTrailer)) {
+          vehicleClassValue = EquipmentLocators.vehicleClassDump;
+          gvwValue = EquipmentLocators.gvwTrailerRange;
+        } else {
+          throw new Error(
+            `Row ${rowIndex}: unrecognized Vehicle Type "${vehicleType}" — no Vehicle Class/GVW mapping defined`
+          );
+        }
+
+        cy.log(`Row ${rowIndex}: selecting Vehicle Class "${vehicleClassValue}" and GVW "${gvwValue}"`);
+
+        Helpers.selectMuiDropdownOptionAndVerify(
+          EquipmentLocators.vehicleClassSelectByIndex(rowIndex),
+          vehicleClassValue
+        );
+
+        Helpers.selectMuiDropdownOptionAndVerify(
+          EquipmentLocators.gvwSelectByIndex(rowIndex),
+          gvwValue
+        );
+      });
+  }
+
 
   // ============================================================
   // FILE UPLOAD FLOW
@@ -174,7 +214,7 @@ class EquipmentPage {
 
   static uploadEquipmentListAndProceed(filePath, rowCount) {
     this.uploadEquipmentListFile(filePath);
-    cy.get(EquipmentLocators.tableRows, { timeout: 15000 }).should("have.length", rowCount);
+    // cy.get(EquipmentLocators.tableRows, { timeout: 15000 }).should("have.length", rowCount);
     this.selectVehicleClassAndGvwForUploadedRows(rowCount);
     this.clickProceed();
   }

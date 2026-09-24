@@ -1,4 +1,14 @@
 class EquipmentLocators {
+
+  static vehicleTypeTractor = "Tractor";
+  static vehicleTypeTrailer = "Trailer";
+
+  static vehicleClassTruckTractor = "Truck Tractor";
+  static vehicleClassDump = "Dump";
+
+  static gvwTractorRange = "> 33,000";
+  static gvwTrailerRange = "> 33,000"; // confirm exact text
+
   static equipmentHeading = "h4.MuiTypography-root.MuiTypography-h4";
   static addEquipmentButton = "button:contains('Add Equipment')";
   static proceedButton =
@@ -7,7 +17,7 @@ class EquipmentLocators {
 
   static vinInputInRow = "input[placeholder='Please enter VIN']";
   static yearInputByIndex = (i) =>
-    `[data-testid='equipment-year-input-${i}'] input`;
+    `[data-testid='equipment-year-input-${i}']`;
   static makeInputByIndex = (i) =>
     `input[name='equipmentsForm.vehicles.${i}.make']`;
   static modelInputByIndex = (i) =>
@@ -16,7 +26,7 @@ class EquipmentLocators {
   static vehicleClassSelectByIndex = (i) =>
     `[data-testid='equipment-class-select-${i}'] div[role='button']`;
   static gvwSelectByIndex = (i) =>
-    `[data-testid='equipment-gvw-select-${i}'] div[role='button']`;
+    `[data-testid='equipment-gvw-select-${i}']`;
   static statedValueInputByIndex = (i) =>
     `[data-testid='equipment-stated-value-input-${i}'] input`;
 

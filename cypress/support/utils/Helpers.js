@@ -25,7 +25,10 @@ class Helpers {
     cy.log(`Selected "${optionText}" from ${selectLocator}`);
   }
 
-
+  static selectMuiDropdownOptionAndVerify(selectLocator, optionText, optionsContainerRole = "listbox") {
+    this.selectMuiDropdownOption(selectLocator, optionText, optionsContainerRole);
+    cy.get(selectLocator).should("contain.text", optionText);
+  }
 
   static selectMuiDropdownOption(selectLocator, optionText, optionsContainerRole = "listbox") {
     cy.log(`Opening dropdown: ${selectLocator}`);

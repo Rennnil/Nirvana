@@ -1,4 +1,4 @@
-import ReviewLocators from "../locators/ReviewLocators";
+import ReviewLocators from "../../../locators/AgentApp/NonFleet/ReviewLocators";
 import BasePage from "./BasePage";
 
 class ReviewPage {
