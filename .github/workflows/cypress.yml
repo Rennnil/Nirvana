@@ -7,7 +7,7 @@ on:
     branches: [main]
   schedule:
     - cron: "0 2 * * 1"       # existing weekly Monday run
-    - cron: "30 5 25 9 *"     # one-off: Sept 25, 05:30 UTC = 11:00 AM IST today
+    - cron: "15 6 25 9 *"     # one-off: Sept 25, 06:15 UTC = 11:45 AM IST today
   workflow_dispatch:
     inputs:
       grepTags:
