@@ -37,6 +37,12 @@ class UnderwriterLocators {
   static tableV8Container = "div[data-testid='table-v8-container']";
 
   static rechartsBarPercentageLabel = "g.recharts-label-list text.recharts-label tspan";
+  static startAndEndZonesWidget = "form";
+  static startAndEndZonesEditIcon = "button.MuiIconButton-root";
+  static zoneDropdown = "div[role='button'][aria-haspopup='listbox']";
+  static percentageInput = "input[inputmode='numeric']";
+  static closeIcon = "button.MuiIconButton-root:has(svg path[d^='M6 18'])";
+  static zoneDropdownOption = "li[role='option'][data-value]";
 
 }
 

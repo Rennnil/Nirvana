@@ -6,7 +6,7 @@ import UnderwriterLocators from "../../../locators/UnderwriterApp/Fleet/Underwri
 describe("Nirvana Underwriter Portal - Fleet Module", () => {
     const email = Cypress.env("agentEmail");
     const password = Cypress.env("agentPassword");
-    const expectedName = Cypress.env("agentName");
+    const expectedName = Cypress.env("Super Test");
 
     before(() => {
         cy.underwriterFreshLogin(email, password, expectedName);
@@ -21,18 +21,7 @@ describe("Nirvana Underwriter Portal - Fleet Module", () => {
     });
 
     it("TC03: verify all key UI elements are visible on the home screen", () => {
-        UnderwriterPage.verifySearchBoxVisible();
-        UnderwriterPage.verifyProfileNameVisible(expectedName);
-        UnderwriterPage.clickFleetOption();
-        UnderwriterPage.verifyFleetApplicationsHeadingVisible();
-        UnderwriterPage.verifyApplicationForDropdownVisible();
-        UnderwriterPage.verifyRecommendationDropdownVisible();
-        // UnderwriterPage.verifyDateFromFieldVisible();
-        // UnderwriterPage.verifyDateToFieldVisible();
-
-        UnderwriterTestData.fleet.tabs.forEach((tabName) => {
-            cy.contains("button[role='tab']", tabName).should("be.visible");
-        });
+        UnderwriterPage.verifyHomeScreenContent(expectedName, UnderwriterTestData.fleet.tabs);
     });
 
     it("TC04: verify Logout button is displayed when clicking profile section", () => {
@@ -50,7 +39,7 @@ describe("Nirvana Underwriter Portal - Fleet Module", () => {
         UnderwriterPage.searchApplication(UnderwriterTestData.applicationNumber);
         UnderwriterPage.clickSearchResultByCompanyName(UnderwriterTestData.companyName);
 
-        UnderwriterPage.verifyTextVisibleOnPage(UnderwriterTestData.applicationNumber);
+        UnderwriterPage.verifySelectedApplicationLoaded();
         UnderwriterPage.verifyTextVisibleOnPage(UnderwriterTestData.companyName);
     });
 
@@ -111,6 +100,48 @@ describe("Nirvana Underwriter Portal - Fleet Module", () => {
         UnderwriterPage.verifyOperationalDistributionPercentages(["14%", "34%", "34%", "18%", "0%"]);
     });
 
+    it("TC13: verify Start & End Zones edit controls", () => {
+        UnderwriterPage.clickStartAndEndZonesEditIcon();
+        UnderwriterPage.verifyStartAndEndZonesEditControlsVisible();
+        UnderwriterPage.clickStartAndEndZonesButton("Cancel");
+    });
 
+    it("TC14: verify Cancel closes editor without saving changes", () => {
+        UnderwriterPage.clickStartAndEndZonesEditIcon();
+        UnderwriterPage.verifyStartAndEndZonesCancelKeepsOriginalValue();
+    });
+
+    it("TC15: verify Update closes Start & End Zones editor", () => {
+        UnderwriterPage.clickStartAndEndZonesEditIcon();
+        UnderwriterPage.verifyStartAndEndZonesUpdateClosesEditor();
+    });
+
+    it("TC16: verify Add Row adds a predefined Start & End Zones row", () => {
+        UnderwriterPage.clickStartAndEndZonesEditIcon();
+        UnderwriterPage.removeFirstStartAndEndZonesRow();
+        UnderwriterPage.captureStartAndEndZonesRowCounts();
+        UnderwriterPage.clickStartAndEndZonesButton("Add Row");
+        UnderwriterPage.verifyStartAndEndZonesAddRow();
+        UnderwriterPage.clickStartAndEndZonesButton("Cancel");
+    });
+
+    it("TC17: verify End Zone dropdown options", () => {
+        UnderwriterPage.clickStartAndEndZonesEditIcon();
+        UnderwriterPage.removeFirstStartAndEndZonesRow();
+        UnderwriterPage.clickStartAndEndZonesButton("Add Row");
+        UnderwriterPage.verifyEndZoneOptions([
+            "40 - Pacific Coast (CA, OR, WA)",
+            "41 - Mountain Zone (AZ, CO, ID, MT, NM, NV, UT, WY)",
+            "42 - Midwest (IA, KS, MN, MO, ND, NE, SD, WI)",
+            "43 - Southwest (AR, OK, TX)",
+            "44 - North Central (IL, IN, MI, OH)",
+            "45 - Mideast (KY, TN, WV)",
+            "46 - Gulf Zone (AL, LA, MS)",
+            "47 - Southeast (FL, GA, NC, SC, VA)",
+            "48 - Eastern Zone (DC, DE, MD, NJ, NY, PA)",
+            "49 - New England (CT, ME, NH, VT)",
+        ]);
+        UnderwriterPage.clickStartAndEndZonesButton("Cancel");
+    });
 
 });

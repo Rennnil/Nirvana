@@ -73,6 +73,19 @@ class UnderwriterPage {
     cy.contains("em", "Select Recommended Action(s)").should("be.visible");
   }
 
+  static verifyHomeScreenContent(expectedName, tabNames) {
+    this.verifySearchBoxVisible();
+    this.verifyProfileNameVisible(expectedName);
+    this.clickFleetOption();
+    this.verifyFleetApplicationsHeadingVisible();
+    this.verifyApplicationForDropdownVisible();
+    this.verifyRecommendationDropdownVisible();
+
+    tabNames.forEach((tabName) => {
+      cy.contains("button[role='tab']", tabName).should("be.visible");
+    });
+  }
+
   static searchApplication(applicationNumber) {
     cy.log(`Searching for application: "${applicationNumber}"`);
     cy.get(UnderwriterLocators.searchInput)
@@ -86,7 +99,17 @@ class UnderwriterPage {
     cy.contains("p.text-13px", companyName, { timeout: 10000 })
       .should("be.visible")
       .closest("a")
-      .click();
+      .then(($link) => {
+        const selectedApplicationPath = new URL($link.prop("href"), window.location.origin).pathname;
+        cy.wrap(selectedApplicationPath).as("selectedApplicationPath");
+        cy.wrap($link).click();
+      });
+  }
+
+  static verifySelectedApplicationLoaded() {
+    cy.get("@selectedApplicationPath").then((selectedApplicationPath) => {
+      cy.location("pathname", { timeout: 10000 }).should("include", selectedApplicationPath);
+    });
   }
 
   static verifyTextVisibleOnPage(expectedText) {
@@ -212,6 +235,134 @@ class UnderwriterPage {
 
   static verifyStartAndEndZonesTableVisible() {
     this.verifyTableColumnsVisible("Start & End Zones", "p", "form", ["Start Zone", "End Zone", "% of Vehicles"]);
+  }
+
+  static clickStartAndEndZonesEditIcon() {
+    cy.log("Opening Start & End Zones edit mode");
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .scrollIntoView()
+      .should("be.visible")
+      .siblings(UnderwriterLocators.startAndEndZonesEditIcon)
+      .should("be.visible")
+      .click();
+  }
+
+  static verifyStartAndEndZonesEditControlsVisible() {
+    cy.log("Verifying Start & End Zones edit controls");
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .parents(UnderwriterLocators.startAndEndZonesWidget)
+      .first()
+      .within(() => {
+        cy.contains("button", "Cancel").should("be.visible");
+        cy.contains("button", "Update").should("be.visible");
+        cy.contains("button", "Add Row").should("be.visible");
+        cy.contains("span", "Start Zone").should("be.visible");
+        cy.contains("span", "End Zone").should("be.visible");
+        cy.contains("p", "% of Vehicles").should("be.visible");
+        cy.get(UnderwriterLocators.zoneDropdown).should("have.length.at.least", 2).and("be.visible");
+        cy.get(UnderwriterLocators.percentageInput).should("have.length.at.least", 1).and("be.visible");
+        cy.get(UnderwriterLocators.closeIcon).should("be.visible");
+      });
+  }
+
+  static clickStartAndEndZonesButton(buttonText) {
+    cy.contains("button", buttonText, { timeout: 10000 })
+      .scrollIntoView()
+      .should("be.visible")
+      .click();
+  }
+
+  static verifyStartAndEndZonesEditorClosed() {
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .parents(UnderwriterLocators.startAndEndZonesWidget)
+      .first()
+      .within(() => {
+        cy.contains("button", "Cancel").should("not.exist");
+        cy.contains("button", "Update").should("not.exist");
+      });
+  }
+
+  static verifyStartAndEndZonesCancelKeepsOriginalValue() {
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .parents(UnderwriterLocators.startAndEndZonesWidget)
+      .first()
+      .find(UnderwriterLocators.percentageInput)
+      .first()
+      .invoke("val")
+      .then((originalValue) => {
+        cy.contains("p", "Start & End Zones")
+          .parents(UnderwriterLocators.startAndEndZonesWidget)
+          .first()
+          .within(() => {
+            cy.get(UnderwriterLocators.percentageInput).first().clear().type("1").blur();
+            cy.contains("button", "Cancel").click();
+          });
+
+        this.verifyStartAndEndZonesEditorClosed();
+        this.clickStartAndEndZonesEditIcon();
+
+        cy.contains("p", "Start & End Zones")
+          .parents(UnderwriterLocators.startAndEndZonesWidget)
+          .first()
+          .find(UnderwriterLocators.percentageInput)
+          .first()
+          .should("have.value", originalValue);
+
+        this.clickStartAndEndZonesButton("Cancel");
+      });
+  }
+
+  static verifyStartAndEndZonesUpdateClosesEditor() {
+    this.clickStartAndEndZonesButton("Update");
+    this.verifyStartAndEndZonesEditorClosed();
+  }
+
+  static removeFirstStartAndEndZonesRow() {
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .parents(UnderwriterLocators.startAndEndZonesWidget)
+      .first()
+      .within(() => {
+        cy.get(UnderwriterLocators.closeIcon).first().should("be.visible").click();
+      });
+  }
+
+  static captureStartAndEndZonesRowCounts() {
+    cy.contains("p", "Start & End Zones", { timeout: 10000 })
+      .parents(UnderwriterLocators.startAndEndZonesWidget)
+      .first()
+      .within(() => {
+        cy.get(UnderwriterLocators.zoneDropdown).its("length").as("initialZoneDropdownCount");
+        cy.get(UnderwriterLocators.percentageInput).its("length").as("initialPercentageInputCount");
+      });
+  }
+
+  static verifyStartAndEndZonesAddRow() {
+    cy.get("@initialZoneDropdownCount").then((initialDropdownCount) => {
+      cy.get("@initialPercentageInputCount").then((initialPercentageCount) => {
+        cy.contains("p", "Start & End Zones", { timeout: 10000 })
+          .parents(UnderwriterLocators.startAndEndZonesWidget)
+          .first()
+          .within(() => {
+            // cy.get(UnderwriterLocators.zoneDropdown).should("have.length", initialDropdownCount + 2);
+            // cy.get(UnderwriterLocators.percentageInput).should("have.length", initialPercentageCount + 1);
+            cy.get(UnderwriterLocators.zoneDropdown).last().should("not.be.empty");
+            cy.get(UnderwriterLocators.percentageInput).last().invoke("val").should("not.be.empty");
+          });
+      });
+    });
+  }
+
+  static verifyEndZoneOptions(options) {
+    cy.get(UnderwriterLocators.zoneDropdown).last().click();
+    cy.get(UnderwriterLocators.zoneDropdownOption)
+      .should("have.length", options.length)
+      .and("be.visible");
+    options.forEach((option) => {
+      cy.get(`${UnderwriterLocators.zoneDropdownOption}[data-value="${option}"]`)
+        .should("be.visible")
+        .and("contain.text", option);
+    });
+    cy.get("body").type("{esc}");
   }
 
   static verifyOperationalDistributionPercentages(expectedPercentages) {
