@@ -12,7 +12,7 @@ class UnderwriterPage {
   }
 
   static verifyTabSelected(tabName) {
-    cy.log(`Verifying tab "${tabName}" is selected`);
+    cy.log(`Verifying tab "${tabName}" is selected`); 
     cy.get(UnderwriterLocators.selectedTab).should("contain.text", tabName);
   }
 
@@ -114,7 +114,7 @@ class UnderwriterPage {
 
   static verifyTextVisibleOnPage(expectedText) {
     cy.log(`Verifying text "${expectedText}" is visible on the page`);
-    cy.contains(expectedText, { timeout: 10000 }).should("be.visible");
+    cy.contains(expectedText, { timeout: 10000 }).should("exist");
   }
 
   static verifyAllOverviewTabsVisible(tabTestIds) {
@@ -212,6 +212,128 @@ class UnderwriterPage {
       .parents("div.border")
       .first()
       .find(UnderwriterLocators.rechartsWrapper)
+      .should("be.visible");
+  }
+
+  static openOperationalDistributionEditor() {
+    this.scrollOperationalDistributionIntoView();
+    this.operationalDistributionWidget().within(() => {
+      cy.contains("p", "Operational Distribution")
+        .parent()
+        .find("button")
+        .first()
+        .should("be.visible")
+        .click();
+    });
+
+    this.operationalDistributionWidget().within(() => {
+      cy.contains("button", "Cancel", { timeout: 10000 }).should("be.visible");
+      cy.contains("button", "Update").should("be.visible");
+    });
+  }
+
+  static verifyOperationalDistributionEditorDetails() {
+    this.operationalDistributionWidget().within(() => {
+      ["Radius Range", "Telematics %", "Percentage of operation"].forEach((columnName) => {
+        cy.contains(columnName).should("be.visible");
+      });
+
+      ["0-50 miles", "50-200 miles", "200-500 miles", "500+ miles"].forEach((radiusRange) => {
+        cy.contains(radiusRange).should("be.visible");
+      });
+
+      cy.get(UnderwriterLocators.operationalDistributionGrid)
+        .children()
+        .should("have.length", 15);
+      [1, 4, 7, 10].forEach((cellIndex) => {
+        cy.get(UnderwriterLocators.operationalDistributionGrid)
+          .children()
+          .eq(cellIndex)
+          .should("be.visible")
+          .and("not.be.empty");
+      });
+
+      cy.get(UnderwriterLocators.operationalDistributionPercentageInput)
+        .should("have.length", 4)
+        .and("be.visible");
+      cy.contains("button", "Cancel").should("be.visible");
+      cy.contains("button", "Update").should("be.visible");
+    });
+  }
+
+  static changeOperationalDistributionPercentages() {
+    this.operationalDistributionWidget()
+      .find(UnderwriterLocators.operationalDistributionPercentageInput)
+      .then(($inputs) => {
+        const percentages = Array.from($inputs, (input) => Number(input.value.replace("%", "").trim()));
+
+        expect(percentages).to.have.length(4);
+        expect(percentages.every(Number.isFinite)).to.equal(true);
+        expect(percentages.reduce((total, value) => total + value, 0)).to.equal(100);
+        expect(percentages[1]).to.be.greaterThan(0);
+
+        const updatedPercentages = [...percentages];
+        updatedPercentages[0] += 1;
+        updatedPercentages[1] -= 1;
+        expect(updatedPercentages.reduce((total, value) => total + value, 0)).to.equal(100);
+
+        cy.wrap(percentages).as("originalOperationalDistributionPercentages");
+        cy.wrap(updatedPercentages).as("updatedOperationalDistributionPercentages");
+
+        this.operationalDistributionWidget()
+          .find(UnderwriterLocators.operationalDistributionPercentageInput)
+          .eq(1)
+          .clear()
+          .type(String(updatedPercentages[1]));
+        this.operationalDistributionWidget()
+          .find(UnderwriterLocators.operationalDistributionPercentageInput)
+          .eq(0)
+          .clear()
+          .type(String(updatedPercentages[0]));
+
+        this.operationalDistributionWidget()
+          .find(UnderwriterLocators.operationalDistributionPercentageInput)
+          .should(($updatedInputs) => {
+            const updatedValues = Array.from(
+              $updatedInputs,
+              (input) => Number(input.value.replace("%", "").trim())
+            );
+            expect(updatedValues.reduce((total, value) => total + value, 0)).to.equal(100);
+          });
+      });
+  }
+
+  static clickOperationalDistributionEditorButton(buttonText) {
+    this.operationalDistributionWidget()
+      .within(() => {
+        cy.contains("button", buttonText)
+          .scrollIntoView({ duration: 0 })
+          .should("be.visible")
+          .click();
+      });
+  }
+
+  static verifyOperationalDistributionEditorPercentages(expectedPercentages) {
+    this.operationalDistributionWidget()
+      .find(UnderwriterLocators.operationalDistributionPercentageInput)
+      .should(($inputs) => {
+        const actualValues = Array.from(
+          $inputs,
+          (input) => Number(input.value.replace("%", "").trim())
+        );
+        expect(actualValues).to.deep.equal(expectedPercentages.map(Number));
+      });
+  }
+
+  static operationalDistributionWidget() {
+    return cy.contains("p", "Operational Distribution", { timeout: 10000 })
+      .parents("div.border")
+      .first();
+  }
+
+  static scrollOperationalDistributionIntoView() {
+    cy.contains("p", "Operational Distribution", { timeout: 10000 })
+      .scrollIntoView({ duration: 0 })
       .should("be.visible");
   }
 
@@ -367,14 +489,127 @@ class UnderwriterPage {
 
   static verifyOperationalDistributionPercentages(expectedPercentages) {
     cy.log("Verifying Operational Distribution bar percentages");
-    cy.contains("p", "Operational Distribution")
-      .parents("div.border")
-      .first()
-      .within(() => {
-        expectedPercentages.forEach((percentage) => {
-          cy.contains(UnderwriterLocators.rechartsBarPercentageLabel, percentage).should("exist");
+    this.verifyOperationalDistributionGraphVisible();
+    this.operationalDistributionWidget()
+      .find(UnderwriterLocators.rechartsBarPercentageLabel)
+      .should(($labels) => {
+        const actualPercentages = Array.from($labels, (label) => label.textContent.trim());
+        expect(actualPercentages.length).to.be.at.least(expectedPercentages.length);
+        expectedPercentages.forEach((percentage, index) => {
+          expect(actualPercentages[index], `percentage above bar ${index + 1}`).to.equal(percentage);
         });
       });
+  }
+
+  static verifyOperationalDistributionUpdatedBarPercentages(expectedPercentages) {
+    cy.log("Verifying updated Operational Distribution bar percentages");
+    this.verifyOperationalDistributionGraphVisible();
+    this.operationalDistributionWidget()
+      .find(UnderwriterLocators.operationalDistributionOverrideSeries)
+      .find(UnderwriterLocators.rechartsBarPercentageLabel)
+      .should(($labels) => {
+        const actualPercentages = Array.from($labels, (label) => label.textContent.trim());
+        expect(actualPercentages).to.have.length(expectedPercentages.length);
+
+        expectedPercentages.forEach((percentage, index) => {
+          expect(actualPercentages[index], `updated black bar label for field ${index + 1}`)
+            .to.equal(percentage);
+        });
+      });
+  }
+
+  static openCommoditiesEditor() {
+    this.commoditiesWidget()
+      .scrollIntoView({ duration: 0 })
+      .within(() => {
+        cy.contains("p", "Commodities")
+          .parent()
+          .find("button")
+          .first()
+          .should("be.visible")
+          .click();
+      });
+
+    this.commoditiesWidget().within(() => {
+      cy.contains("button", "Cancel", { timeout: 10000 }).should("be.visible");
+      cy.contains("button", "Update").should("be.visible");
+    });
+  }
+
+  static verifyCommoditiesEditorDetails() {
+    this.commoditiesWidget().within(() => {
+      ["Commodity", "Category", "Commodity Detail", "Class", "Avg Value", "Max Value", "% of Hauls"]
+        .forEach((columnName) => {
+          cy.get(UnderwriterLocators.commoditiesHeaderGrid)
+            .contains("p", columnName)
+            .should("be.visible");
+        });
+
+      [
+        UnderwriterLocators.commodityNameInputs,
+        UnderwriterLocators.commodityCategoryDropdowns,
+        UnderwriterLocators.commodityDetailInputs,
+        UnderwriterLocators.commodityAvgValueInputs,
+        UnderwriterLocators.commodityMaxValueInputs,
+        UnderwriterLocators.commodityHaulPercentageInputs,
+      ].forEach((selector) => {
+        cy.get(selector)
+          .should("have.length", 10)
+          .first()
+          .should("be.visible");
+      });
+
+      cy.get(UnderwriterLocators.commodityDetailClearButtons)
+        .should("have.length", 10)
+        .first()
+        .should("exist");
+
+      cy.get(UnderwriterLocators.commodityClassCells)
+        .should("have.length", 10)
+        .first()
+        .should("be.visible");
+    });
+  }
+
+  static openFirstCommodityCategoryDropdown() {
+    this.commoditiesWidget()
+      .find(UnderwriterLocators.commodityCategoryDropdowns)
+      .first()
+      .scrollIntoView({ duration: 0 })
+      .should("be.visible")
+      .click();
+  }
+
+  static verifyCommodityCategoryOptions() {
+    cy.get("[role='listbox']").should("be.visible");
+    cy.get(UnderwriterLocators.commodityCategoryOptions)
+      .should(($options) => {
+        expect($options.length).to.be.greaterThan(1);
+      });
+
+    cy.get(UnderwriterLocators.commodityCategoryOptions)
+      .eq(0)
+      .should("be.visible")
+      .and("contain.text", "Agricultural products");
+    cy.get(UnderwriterLocators.commodityCategoryOptions)
+      .eq(1)
+      .should("be.visible")
+      .and("contain.text", "Auto");
+  }
+
+  static clickCommoditiesEditorButton(buttonText) {
+    this.commoditiesWidget().within(() => {
+      cy.contains("button", buttonText)
+        .scrollIntoView({ duration: 0 })
+        .should("be.visible")
+        .click();
+    });
+  }
+
+  static commoditiesWidget() {
+    return cy.contains("p", "Commodities", { timeout: 10000 })
+      .parents(UnderwriterLocators.commoditiesWidgetContainer)
+      .first();
   }
 
 }

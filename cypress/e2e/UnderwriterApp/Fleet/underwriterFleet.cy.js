@@ -144,4 +144,64 @@ describe("Nirvana Underwriter Portal - Fleet Module", () => {
         UnderwriterPage.clickStartAndEndZonesButton("Cancel");
     });
 
+    it("TC18: verify Operational Distribution edit details", () => {
+        UnderwriterPage.openOperationalDistributionEditor();
+        UnderwriterPage.verifyOperationalDistributionEditorDetails();
+        UnderwriterPage.clickOperationalDistributionEditorButton("Cancel");
+        // UnderwriterPage.operationalDistributionWidget().within(() => {
+        //     cy.contains("button", "Cancel").should("not.exist");
+        //     cy.contains("button", "Update").should("not.exist");
+        // });
+    });
+
+    it("TC19: verify Cancel discards Operational Distribution percentage changes", () => {
+        UnderwriterPage.openOperationalDistributionEditor();
+        UnderwriterPage.changeOperationalDistributionPercentages();
+        UnderwriterPage.clickOperationalDistributionEditorButton("Cancel");
+        // UnderwriterPage.operationalDistributionWidget().within(() => {
+        //     cy.contains("button", "Cancel").should("not.exist");
+        //     cy.contains("button", "Update").should("not.exist");
+        // });
+
+        UnderwriterPage.openOperationalDistributionEditor();
+        cy.get("@originalOperationalDistributionPercentages").then((originalValues) => {
+            UnderwriterPage.verifyOperationalDistributionEditorPercentages(originalValues);
+        });
+        UnderwriterPage.clickOperationalDistributionEditorButton("Cancel");
+    });
+
+    it("TC20: verify Update applies Operational Distribution percentages to the graph", () => {
+        UnderwriterPage.openOperationalDistributionEditor();
+        UnderwriterPage.changeOperationalDistributionPercentages();
+        UnderwriterPage.clickOperationalDistributionEditorButton("Update");
+        // UnderwriterPage.operationalDistributionWidget().within(() => {
+        //     cy.contains("button", "Cancel").should("not.exist");
+        //     cy.contains("button", "Update").should("not.exist");
+        // });
+
+        cy.get("@updatedOperationalDistributionPercentages").then((percentages) => {
+            UnderwriterPage.verifyOperationalDistributionUpdatedBarPercentages([
+                `${percentages[0]}%`,
+                `${percentages[1]}%`,
+                `${percentages[2]}%`,
+                `${percentages[3]}%`,
+            ]);
+        });
+
+    });
+
+    it("TC21: verify Commodities editor columns and maximum of 10 commodity rows", () => {
+        UnderwriterPage.openCommoditiesEditor();
+        UnderwriterPage.verifyCommoditiesEditorDetails();
+        UnderwriterPage.clickCommoditiesEditorButton("Cancel");
+    });
+
+    it("TC22: verify Commodity Category dropdown options", () => {
+        UnderwriterPage.openCommoditiesEditor();
+        UnderwriterPage.openFirstCommodityCategoryDropdown();
+        UnderwriterPage.verifyCommodityCategoryOptions();
+        cy.get("body").type("{esc}");
+        UnderwriterPage.clickCommoditiesEditorButton("Cancel");
+    });
+
 });

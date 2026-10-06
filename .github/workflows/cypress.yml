@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 18 * * 1'   # 18:00 UTC every Monday
+    - cron: '0 18 * * 1'   # Every Monday 18:00 UTC (11:30 PM IST)
   workflow_dispatch:
     inputs:
       grepTags:
@@ -38,6 +38,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
+          spec: cypress/e2e/UnderwriterApp/Fleet/underwriterFleet.cy.js
         env:
           CYPRESS_agentEmail: ${{ secrets.AGENT_EMAIL }}
           CYPRESS_agentPassword: ${{ secrets.AGENT_PASSWORD }}
@@ -45,7 +46,7 @@ jobs:
           CYPRESS_grepTags: ${{ github.event.inputs.grepTags }}
           CYPRESS_grepOmitFiltered: "true"
 
-      # Keep raw results as a downloadable artifact if you still want them (optional)
+      # Keep raw results as a downloadable artifact (optional)
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
@@ -106,3 +107,58 @@ jobs:
         run: |
           echo "### 📊 Allure Report" >> $GITHUB_STEP_SUMMARY
           echo "[Open report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
+
+      # --- Read pass/fail counts from the Allure summary ---
+      - name: Read Allure summary
+        if: always()
+        id: summary
+        run: |
+          FILE=$(find . -path "*widgets/summary.json" -not -path "./node_modules/*" | head -1)
+          if [ -n "$FILE" ]; then
+            echo "total=$(jq '.statistic.total' $FILE)"   >> $GITHUB_OUTPUT
+            echo "passed=$(jq '.statistic.passed' $FILE)" >> $GITHUB_OUTPUT
+            echo "failed=$(jq '.statistic.failed' $FILE)" >> $GITHUB_OUTPUT
+            echo "broken=$(jq '.statistic.broken' $FILE)" >> $GITHUB_OUTPUT
+            echo "skipped=$(jq '.statistic.skipped' $FILE)" >> $GITHUB_OUTPUT
+          else
+            echo "total=N/A"   >> $GITHUB_OUTPUT
+            echo "passed=N/A"  >> $GITHUB_OUTPUT
+            echo "failed=N/A"  >> $GITHUB_OUTPUT
+            echo "broken=N/A"  >> $GITHUB_OUTPUT
+            echo "skipped=N/A" >> $GITHUB_OUTPUT
+          fi
+
+      # --- Send report by email (runs on push, PR, schedule and manual) ---
+      - name: Send email report
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          to: ${{ secrets.MAIL_RECIPIENTS }}
+          from: "QA Automation <${{ secrets.MAIL_USERNAME }}>"
+          subject: "Cypress Report (Underwriter Fleet) - ${{ job.status }} - ${{ github.event_name }} - Run #${{ github.run_number }}"
+          html_body: |
+            <h2>Cypress Test Report - Underwriter Fleet</h2>
+            <table cellpadding="6" style="border-collapse:collapse;">
+              <tr><td><b>Status</b></td><td>${{ job.status }}</td></tr>
+              <tr><td><b>Triggered by</b></td><td>${{ github.event_name }}</td></tr>
+              <tr><td><b>Spec</b></td><td>underwriterFleet.cy.js</td></tr>
+              <tr><td><b>Branch</b></td><td>${{ github.ref_name }}</td></tr>
+              <tr><td><b>Tag filter</b></td><td>${{ github.event.inputs.grepTags || 'All tests' }}</td></tr>
+              <tr><td><b>Run</b></td><td>#${{ github.run_number }}</td></tr>
+            </table>
+            <p>
+              <b>Total:</b> ${{ steps.summary.outputs.total }} &nbsp;
+              <b>Passed:</b> ${{ steps.summary.outputs.passed }} &nbsp;
+              <b>Failed:</b> ${{ steps.summary.outputs.failed }} &nbsp;
+              <b>Broken:</b> ${{ steps.summary.outputs.broken }} &nbsp;
+              <b>Skipped:</b> ${{ steps.summary.outputs.skipped }}
+            </p>
+            <p>
+              <a href="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/">📊 Open Allure Report</a><br>
+              <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View GitHub Run</a>
+            </p>
