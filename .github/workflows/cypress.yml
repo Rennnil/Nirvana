@@ -138,7 +138,7 @@ jobs:
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          to: ${{ secrets.MAIL_RECIPIENTS }}
+          to: ${{ secrets.MAIL_RECIPIENT }}
           from: "QA Automation <${{ secrets.MAIL_USERNAME }}>"
           subject: "Cypress Report (Underwriter Fleet) - ${{ job.status }} - ${{ github.event_name }} - Run #${{ github.run_number }}"
           html_body: |
