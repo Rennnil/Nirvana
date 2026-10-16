@@ -12,7 +12,7 @@ class UnderwriterPage {
   }
 
   static verifyTabSelected(tabName) {
-    cy.log(`Verifying tab "${tabName}" is selected`); 
+    cy.log(`Verifying tab "${tabName}" is selected`);
     cy.get(UnderwriterLocators.selectedTab).should("contain.text", tabName);
   }
 
