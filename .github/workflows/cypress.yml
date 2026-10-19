@@ -38,7 +38,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          spec: cypress/e2e/UnderwriterApp/Fleet/underwriterFleet.cy.js
+          spec: cypress/e2e/**/*.cy.js
         env:
           CYPRESS_agentEmail: ${{ secrets.AGENT_EMAIL }}
           CYPRESS_agentPassword: ${{ secrets.AGENT_PASSWORD }}
@@ -129,6 +129,7 @@ jobs:
           fi
 
       # --- Send report by email (runs on push, PR, schedule and manual) ---
+            # --- Send styled Cypress report by email ---
       - name: Send email report
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -139,26 +140,180 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           to: ${{ secrets.MAIL_RECIPIENT }}
-          from: "QA Automation <${{ secrets.MAIL_USERNAME }}>"
-          subject: "Cypress Report (Underwriter Fleet) - ${{ job.status }} - ${{ github.event_name }} - Run #${{ github.run_number }}"
+          from: "Nirvana QA Automation <${{ secrets.MAIL_USERNAME }}>"
+          subject: "🚀 Nirvana QA | Underwriter Fleet | ${{ job.status }} | Run #${{ github.run_number }}"
           html_body: |
-            <h2>Cypress Test Report - Underwriter Fleet</h2>
-            <table cellpadding="6" style="border-collapse:collapse;">
-              <tr><td><b>Status</b></td><td>${{ job.status }}</td></tr>
-              <tr><td><b>Triggered by</b></td><td>${{ github.event_name }}</td></tr>
-              <tr><td><b>Spec</b></td><td>underwriterFleet.cy.js</td></tr>
-              <tr><td><b>Branch</b></td><td>${{ github.ref_name }}</td></tr>
-              <tr><td><b>Tag filter</b></td><td>${{ github.event.inputs.grepTags || 'All tests' }}</td></tr>
-              <tr><td><b>Run</b></td><td>#${{ github.run_number }}</td></tr>
-            </table>
-            <p>
-              <b>Total:</b> ${{ steps.summary.outputs.total }} &nbsp;
-              <b>Passed:</b> ${{ steps.summary.outputs.passed }} &nbsp;
-              <b>Failed:</b> ${{ steps.summary.outputs.failed }} &nbsp;
-              <b>Broken:</b> ${{ steps.summary.outputs.broken }} &nbsp;
-              <b>Skipped:</b> ${{ steps.summary.outputs.skipped }}
-            </p>
-            <p>
-              <a href="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/">📊 Open Allure Report</a><br>
-              <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View GitHub Run</a>
-            </p>
+            <!DOCTYPE html>
+            <html>
+            <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f5f9;padding:24px 8px;">
+                <tr>
+                  <td align="center">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:680px;background:#ffffff;border-radius:14px;overflow:hidden;">
+
+                      <!-- Header -->
+                      <tr>
+                        <td style="background:#14213d;padding:28px 30px;color:#ffffff;">
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td>
+                                <div style="font-size:12px;letter-spacing:2px;color:#c4b5fd;font-weight:bold;">
+                                  NIRVANA QA
+                                </div>
+                                <div style="font-size:25px;font-weight:bold;margin-top:12px;">
+                                  Automation Report
+                                </div>
+                                <div style="font-size:13px;color:#cbd5e1;margin-top:7px;">
+                                  Cypress Test Execution Dashboard
+                                </div>
+                              </td>
+                              <td align="right" valign="top">
+                                <span style="display:inline-block;background:#7c5cfc;color:#ffffff;padding:8px 12px;border-radius:7px;font-size:11px;font-weight:bold;">
+                                  CYPRESS
+                                </span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- Status banner -->
+                      <tr>
+                        <td style="padding:24px 30px 10px;">
+                          <div style="font-size:11px;color:#64748b;font-weight:bold;letter-spacing:1px;">
+                            EXECUTION STATUS
+                          </div>
+                          <div style="margin-top:10px;padding:17px;background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #7c5cfc;border-radius:8px;">
+                            <div style="font-size:22px;font-weight:bold;color:#0f172a;">
+                              ${{ job.status == 'success' && '✅ SUCCESS' || job.status == 'failure' && '❌ FAILURE' || job.status == 'cancelled' && '⚠️ CANCELLED' || 'ℹ️ COMPLETED WITH WARNINGS' }}
+                            </div>
+                            <div style="font-size:13px;color:#64748b;margin-top:7px;">
+                              Run #${{ github.run_number }} · ${{ github.event_name }}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <!-- Test metrics -->
+                      <tr>
+                        <td style="padding:20px 30px 8px;">
+                          <div style="font-size:17px;font-weight:bold;color:#0f172a;margin-bottom:15px;">
+                            Test Execution Overview
+                          </div>
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td width="50%" style="padding:0 6px 12px 0;">
+                                <div style="padding:16px;background:#f1f5f9;border-radius:9px;">
+                                  <div style="font-size:12px;color:#64748b;">TOTAL TESTS</div>
+                                  <div style="font-size:30px;font-weight:bold;color:#0f172a;margin-top:6px;">
+                                    ${{ steps.summary.outputs.total }}
+                                  </div>
+                                </div>
+                              </td>
+                              <td width="50%" style="padding:0 0 12px 6px;">
+                                <div style="padding:16px;background:#ecfdf5;border-radius:9px;">
+                                  <div style="font-size:12px;color:#047857;">PASSED</div>
+                                  <div style="font-size:30px;font-weight:bold;color:#059669;margin-top:6px;">
+                                    ${{ steps.summary.outputs.passed }}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td width="50%" style="padding:0 6px 0 0;">
+                                <div style="padding:16px;background:#fef2f2;border-radius:9px;">
+                                  <div style="font-size:12px;color:#b91c1c;">FAILED</div>
+                                  <div style="font-size:30px;font-weight:bold;color:#dc2626;margin-top:6px;">
+                                    ${{ steps.summary.outputs.failed }}
+                                  </div>
+                                </div>
+                              </td>
+                              <td width="50%" style="padding:0 0 0 6px;">
+                                <div style="padding:16px;background:#fff7ed;border-radius:9px;">
+                                  <div style="font-size:12px;color:#c2410c;">BROKEN / SKIPPED</div>
+                                  <div style="font-size:30px;font-weight:bold;color:#ea580c;margin-top:6px;">
+                                    ${{ steps.summary.outputs.broken }} / ${{ steps.summary.outputs.skipped }}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- Run details -->
+                      <tr>
+                        <td style="padding:25px 30px;">
+                          <div style="font-size:17px;font-weight:bold;color:#0f172a;margin-bottom:12px;">
+                            Execution Details
+                          </div>
+                          <table role="presentation" width="100%" cellpadding="10" cellspacing="0" border="0" style="font-size:13px;border:1px solid #e2e8f0;border-collapse:collapse;">
+                            <tr style="background:#f8fafc;">
+                              <td style="color:#64748b;border-bottom:1px solid #e2e8f0;">Application</td>
+                              <td style="font-weight:bold;border-bottom:1px solid #e2e8f0;">Underwriter Fleet</td>
+                            </tr>
+                            <tr>
+                              <td style="color:#64748b;border-bottom:1px solid #e2e8f0;">Trigger</td>
+                              <td style="border-bottom:1px solid #e2e8f0;">${{ github.event_name }}</td>
+                            </tr>
+                            <tr style="background:#f8fafc;">
+                              <td style="color:#64748b;border-bottom:1px solid #e2e8f0;">Branch / Ref</td>
+                              <td style="border-bottom:1px solid #e2e8f0;">${{ github.ref_name }}</td>
+                            </tr>
+                            <tr>
+                              <td style="color:#64748b;border-bottom:1px solid #e2e8f0;">Test filter</td>
+                              <td style="border-bottom:1px solid #e2e8f0;">${{ github.event.inputs.grepTags || 'All tests' }}</td>
+                            </tr>
+                            <tr style="background:#f8fafc;">
+                              <td style="color:#64748b;">Workflow run</td>
+                              <td>#${{ github.run_number }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- Report links -->
+                      <tr>
+                        <td style="padding:0 30px 30px;">
+                          <div style="font-size:17px;font-weight:bold;color:#0f172a;margin-bottom:14px;">
+                            Explore Your Results
+                          </div>
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="background:#6d4aff;border-radius:7px;">
+                                <a href="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" style="display:inline-block;padding:13px 19px;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;">
+                                  📊 Open Allure Report
+                                </a>
+                              </td>
+                              <td width="10"></td>
+                              <td style="background:#14213d;border-radius:7px;">
+                                <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" style="display:inline-block;padding:13px 19px;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;">
+                                  🔗 View Workflow
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- Footer -->
+                      <tr>
+                        <td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 30px;text-align:center;">
+                          <div style="font-size:12px;font-weight:bold;color:#475569;">
+                            NIRVANA QA AUTOMATION
+                          </div>
+                          <div style="font-size:11px;color:#94a3b8;margin-top:6px;">
+                            Automated report generated by GitHub Actions
+                          </div>
+                          <div style="font-size:11px;color:#94a3b8;margin-top:5px;">
+                            Please do not reply to this automated email.
+                          </div>
+                        </td>
+                      </tr>
+
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
