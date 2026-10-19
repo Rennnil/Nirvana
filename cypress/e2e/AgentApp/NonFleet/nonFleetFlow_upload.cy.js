@@ -171,161 +171,161 @@
 
 
 
-// describe("Nirvana Agent Portal - Non-Fleet Flow (Upload)", () => {
-//   const email = Cypress.env("agentEmail");
-//   const password = Cypress.env("agentPassword");
-//   const expectedName = Cypress.env("agentName");
-//   const category = TestData.nonFleet.category;
+describe("Nirvana Agent Portal - Non-Fleet Flow (Upload)", () => {
+  const email = Cypress.env("agentEmail");
+  const password = Cypress.env("agentPassword");
+  const expectedName = Cypress.env("agentName");
+  const category = TestData.nonFleet.category;
 
-//   let operationsData = {};
-//   let selectedOperatingClass = "";
-//   let selectedPlanName = "";
-//   let insuredDetails;
-//   let fetchedCompanyName;
+  let operationsData = {};
+  let selectedOperatingClass = "";
+  let selectedPlanName = "";
+  let insuredDetails;
+  let fetchedCompanyName;
 
-//   before(() => {
-//     cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
-//       insuredDetails = {
-//         ...fixtureData,
-//         effectiveDate: DataGenerator.getCurrentFormattedDate(),
-//         powerUnits: DataGenerator.getPowerUnitsCount(),
-//       };
-//     });
+  before(() => {
+    cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
+      insuredDetails = {
+        ...fixtureData,
+        effectiveDate: DataGenerator.getCurrentFormattedDate(),
+        powerUnits: DataGenerator.getPowerUnitsCount(),
+      };
+    });
 
-//     cy.loginIfNeeded(email, password, expectedName);
-//   });
+    cy.loginIfNeeded(email, password, expectedName);
+  });
 
-//   it(
-//     "TC01: Complete Non-Fleet Upload Flow End-to-End",
-//     { tags: "@UploadFlow" },
-//     () => {
+  it(
+    "TC01: Complete Non-Fleet Upload Flow End-to-End",
+    { tags: "@UploadFlow" },
+    () => {
 
-//       // Dashboard Verification
-//       DashboardPage.verifyAgentNameVisible(expectedName);
+      // Dashboard Verification
+      DashboardPage.verifyAgentNameVisible(expectedName);
 
-//       // Select Category
-//       DashboardPage.selectCategory(category);
+      // Select Category
+      DashboardPage.selectCategory(category);
 
-//       // Create New Application
-//       DashboardPage.verifyNewApplicationButtonVisible();
-//       DashboardPage.clickNewApplicationButton();
+      // Create New Application
+      DashboardPage.verifyNewApplicationButtonVisible();
+      DashboardPage.clickNewApplicationButton();
 
-//       // Verify Popup
-//       InsuredDetailsPage.verifyPopupVisible(
-//         TestData.nonFleet.popupText
-//       );
+      // Verify Popup
+      InsuredDetailsPage.verifyPopupVisible(
+        TestData.nonFleet.popupText
+      );
 
-//       // Fill Insured Details
-//       InsuredDetailsPage.fillInsuredDetails(insuredDetails).then(
-//         (companyName) => {
-//           fetchedCompanyName = companyName;
+      // Fill Insured Details
+      InsuredDetailsPage.fillInsuredDetails(insuredDetails).then(
+        (companyName) => {
+          fetchedCompanyName = companyName;
 
-//           InsuredDetailsPage.clickContinue();
-//           InsuredDetailsPage.clickNoOption();
+          InsuredDetailsPage.clickContinue();
+          InsuredDetailsPage.clickNoOption();
 
-//           // Operations Screen Verification
-//           OperationsPage.verifyOperationsScreen(
-//             insuredDetails.dotNumber,
-//             fetchedCompanyName
-//           );
+          // Operations Screen Verification
+          OperationsPage.verifyOperationsScreen(
+            insuredDetails.dotNumber,
+            fetchedCompanyName
+          );
 
-//           // Negative Validation
-//           OperationsPage.verifyProceedBlockedWithoutData();
+          // Negative Validation
+          OperationsPage.verifyProceedBlockedWithoutData();
 
-//           // Operations Data
-//           OperationsPage.verifyEffectiveDate(
-//             insuredDetails.effectiveDate
-//           );
-//           OperationsPage.verifyProducer(
-//             insuredDetails.producer
-//           );
-//           OperationsPage.verifyCoverageCheckboxState(
-//             "Auto Liability",
-//             true
-//           );
+          // Operations Data
+          OperationsPage.verifyEffectiveDate(
+            insuredDetails.effectiveDate
+          );
+          OperationsPage.verifyProducer(
+            insuredDetails.producer
+          );
+          OperationsPage.verifyCoverageCheckboxState(
+            "Auto Liability",
+            true
+          );
 
-//           operationsData = TestData.nonFleet.operations;
+          operationsData = TestData.nonFleet.operations;
 
-//           OperationsPage.fillOperationsForm({
-//             ...operationsData,
-//             dob: DataGenerator.getRandomDob(),
-//           }).then((capturedClass) => {
-//             selectedOperatingClass = capturedClass;
+          OperationsPage.fillOperationsForm({
+            ...operationsData,
+            dob: DataGenerator.getRandomDob(),
+          }).then((capturedClass) => {
+            selectedOperatingClass = capturedClass;
 
-//             OperationsPage.clickProceed();
-//             OperationsPage.handleSsnPopupIfPresent();
+            OperationsPage.clickProceed();
+            OperationsPage.handleSsnPopupIfPresent();
 
-//             // Equipment Screen
-//             EquipmentPage.verifyEquipmentHeadingVisible();
-//             EquipmentPage.verifyProceedBlockedWithoutData();
+            // Equipment Screen
+            EquipmentPage.verifyEquipmentHeadingVisible();
+            EquipmentPage.verifyProceedBlockedWithoutData();
 
-//             EquipmentPage.uploadEquipmentListAndProceed(
-//               TestData.nonFleet.upload.equipmentFilePath,
-//               TestData.nonFleet.upload.equipmentRowCount
-//             );
+            EquipmentPage.uploadEquipmentListAndProceed(
+              TestData.nonFleet.upload.equipmentFilePath,
+              TestData.nonFleet.upload.equipmentRowCount
+            );
 
-//             // Drivers Screen
-//             DriversPage.verifyProceedBlockedWithoutData();
+            // Drivers Screen
+            DriversPage.verifyProceedBlockedWithoutData();
 
-//             DriversPage.uploadDriverListAndProceed(
-//               TestData.nonFleet.upload.driversFilePath,
-//               TestData.nonFleet.upload.driversRowCount
-//             );
+            DriversPage.uploadDriverListAndProceed(
+              TestData.nonFleet.upload.driversFilePath,
+              TestData.nonFleet.upload.driversRowCount
+            );
 
-//             // Indication Screen
-//             IndicationPage.verifyIndicationHeadingVisible();
-//             IndicationPage.verifyProceedBlockedWithoutTelematics();
+            // Indication Screen
+            IndicationPage.verifyIndicationHeadingVisible();
+            IndicationPage.verifyProceedBlockedWithoutTelematics();
 
-//             IndicationPage.verifyDefaultDeductibleAndLimits(
-//               TestData.nonFleet.indication.defaultDeductible,
-//               TestData.nonFleet.indication.defaultLimits
-//             );
+            IndicationPage.verifyDefaultDeductibleAndLimits(
+              TestData.nonFleet.indication.defaultDeductible,
+              TestData.nonFleet.indication.defaultLimits
+            );
 
-//             IndicationPage.completeIndicationScreen(
-//               TestData.nonFleet.indication
-//             ).then((capturedPlan) => {
-//               selectedPlanName = capturedPlan;
+            IndicationPage.completeIndicationScreen(
+              TestData.nonFleet.indication
+            ).then((capturedPlan) => {
+              selectedPlanName = capturedPlan;
 
-//               // Review Screen
-//               ReviewPage.verifyReviewHeadingVisible();
+              // Review Screen
+              ReviewPage.verifyReviewHeadingVisible();
 
-//               ReviewPage.verifyOperationsSection({
-//                 effectiveDate: insuredDetails.effectiveDate,
-//                 producer: insuredDetails.producer,
-//                 businessOwnerName: `${operationsData.firstName} ${operationsData.lastName}`,
-//                 primaryOperatingClass: selectedOperatingClass,
-//                 farthestRadius:
-//                   operationsData.farthestRadiusOption,
-//                 allClaims: operationsData.allClaimsCount,
-//                 primaryCommodity:
-//                   TestData.nonFleet.review.primaryCommodity,
-//               });
+              ReviewPage.verifyOperationsSection({
+                effectiveDate: insuredDetails.effectiveDate,
+                producer: insuredDetails.producer,
+                businessOwnerName: `${operationsData.firstName} ${operationsData.lastName}`,
+                primaryOperatingClass: selectedOperatingClass,
+                farthestRadius:
+                  operationsData.farthestRadiusOption,
+                allClaims: operationsData.allClaimsCount,
+                primaryCommodity:
+                  TestData.nonFleet.review.primaryCommodity,
+              });
 
-//               ReviewPage.verifyIndicationSection({
-//                 deductibleValue:
-//                   TestData.nonFleet.indication
-//                     .deductibleOption,
-//                 limitsValue:
-//                   TestData.nonFleet.indication
-//                     .limitsOption,
-//                 telematicsEmail:
-//                   Cypress.env("agentEmail"),
-//                 planName: selectedPlanName,
-//               });
+              ReviewPage.verifyIndicationSection({
+                deductibleValue:
+                  TestData.nonFleet.indication
+                    .deductibleOption,
+                limitsValue:
+                  TestData.nonFleet.indication
+                    .limitsOption,
+                telematicsEmail:
+                  Cypress.env("agentEmail"),
+                planName: selectedPlanName,
+              });
 
-//               ReviewPage.submitAndVerifySuccess();
+              ReviewPage.submitAndVerifySuccess();
 
-//               // Logout
-//               DashboardPage.verifyAgentNameVisible(
-//                 expectedName
-//               );
-//               DashboardPage.logout();
+              // Logout
+              DashboardPage.verifyAgentNameVisible(
+                expectedName
+              );
+              DashboardPage.logout();
 
-//               cy.url().should("include", "/login");
-//             });
-//           });
-//         }
-//       );
-//     }
-//   );
-// });
+              cy.url().should("include", "/login");
+            });
+          });
+        }
+      );
+    }
+  );
+});

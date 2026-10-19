@@ -179,161 +179,161 @@
 // // });
 
 
-// describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
-//   const email = Cypress.env("agentEmail");
-//   const password = Cypress.env("agentPassword");
-//   const expectedName = Cypress.env("Super Test");
-//   const category = TestData.nonFleet.category;
+describe("Nirvana Agent Portal - Non-Fleet Flow", () => {
+  const email = Cypress.env("agentEmail");
+  const password = Cypress.env("agentPassword");
+  const expectedName = Cypress.env("Super Test");
+  const category = TestData.nonFleet.category;
 
-//   let operationsData = {};
-//   let equipmentVins = [];
-//   let driversCdlNumbers = [];
-//   let selectedOperatingClass = "";
-//   let selectedPlanName = "";
+  let operationsData = {};
+  let equipmentVins = [];
+  let driversCdlNumbers = [];
+  let selectedOperatingClass = "";
+  let selectedPlanName = "";
 
-//   let insuredDetails;
-//   let fetchedCompanyName;
+  let insuredDetails;
+  let fetchedCompanyName;
 
-//   before(() => {
-//     cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
-//       insuredDetails = {
-//         ...fixtureData,
-//         effectiveDate: DataGenerator.getCurrentFormattedDate(),
-//         powerUnits: DataGenerator.getPowerUnitsCount(),
-//       };
-//     });
+  before(() => {
+    cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
+      insuredDetails = {
+        ...fixtureData,
+        effectiveDate: DataGenerator.getCurrentFormattedDate(),
+        powerUnits: DataGenerator.getPowerUnitsCount(),
+      };
+    });
 
-//     cy.loginIfNeeded(email, password, expectedName);
-//   });
+    cy.loginIfNeeded(email, password, expectedName);
+  });
 
-//   it("TC01: Complete Non-Fleet End-to-End Flow", { tags: "@NonFleet" }, () => {
+  it("TC01: Complete Non-Fleet End-to-End Flow", { tags: "@NonFleet" }, () => {
 
-//     // Dashboard
-//     DashboardPage.verifyAgentNameVisible(expectedName);
+    // Dashboard
+    DashboardPage.verifyAgentNameVisible(expectedName);
 
-//     // Select Category
-//     DashboardPage.selectCategory(category);
+    // Select Category
+    DashboardPage.selectCategory(category);
 
-//     // New Application
-//     DashboardPage.verifyNewApplicationButtonVisible();
-//     DashboardPage.clickNewApplicationButton();
+    // New Application
+    DashboardPage.verifyNewApplicationButtonVisible();
+    DashboardPage.clickNewApplicationButton();
 
-//     // Popup Verification
-//     InsuredDetailsPage.verifyPopupVisible(TestData.nonFleet.popupText);
+    // Popup Verification
+    InsuredDetailsPage.verifyPopupVisible(TestData.nonFleet.popupText);
 
-//     // Fill Insured Details
-//     InsuredDetailsPage.fillInsuredDetails(insuredDetails).then((companyName) => {
-//       fetchedCompanyName = companyName;
-//     });
+    // Fill Insured Details
+    InsuredDetailsPage.fillInsuredDetails(insuredDetails).then((companyName) => {
+      fetchedCompanyName = companyName;
+    });
 
-//     InsuredDetailsPage.clickContinue();
-//     InsuredDetailsPage.clickNoOption();
+    InsuredDetailsPage.clickContinue();
+    InsuredDetailsPage.clickNoOption();
 
-//     // Operations Screen Validation
-//     OperationsPage.verifyOperationsScreen(
-//       insuredDetails.dotNumber,
-//       fetchedCompanyName
-//     );
+    // Operations Screen Validation
+    OperationsPage.verifyOperationsScreen(
+      insuredDetails.dotNumber,
+      fetchedCompanyName
+    );
 
-//     // Negative Validation
-//     OperationsPage.verifyProceedBlockedWithoutData();
+    // Negative Validation
+    OperationsPage.verifyProceedBlockedWithoutData();
 
-//     // Verify Prefilled Data
-//     OperationsPage.verifyEffectiveDate(insuredDetails.effectiveDate);
-//     OperationsPage.verifyProducer(insuredDetails.producer);
-//     OperationsPage.verifyCoverageCheckboxState("Auto Liability", true);
+    // Verify Prefilled Data
+    OperationsPage.verifyEffectiveDate(insuredDetails.effectiveDate);
+    OperationsPage.verifyProducer(insuredDetails.producer);
+    OperationsPage.verifyCoverageCheckboxState("Auto Liability", true);
 
-//     // Fill Operations
-//     operationsData = TestData.nonFleet.operations;
+    // Fill Operations
+    operationsData = TestData.nonFleet.operations;
 
-//     OperationsPage.fillOperationsForm({
-//       ...operationsData,
-//       dob: DataGenerator.getRandomDob(),
-//     }).then((capturedClass) => {
-//       selectedOperatingClass = capturedClass;
-//     });
+    OperationsPage.fillOperationsForm({
+      ...operationsData,
+      dob: DataGenerator.getRandomDob(),
+    }).then((capturedClass) => {
+      selectedOperatingClass = capturedClass;
+    });
 
-//     OperationsPage.clickProceed();
-//     OperationsPage.handleSsnPopupIfPresent();
+    OperationsPage.clickProceed();
+    OperationsPage.handleSsnPopupIfPresent();
 
-//     // Equipment Negative Validation
-//     EquipmentPage.verifyEquipmentHeadingVisible();
-//     EquipmentPage.verifyProceedBlockedWithoutData();
+    // Equipment Negative Validation
+    EquipmentPage.verifyEquipmentHeadingVisible();
+    EquipmentPage.verifyProceedBlockedWithoutData();
 
-//     // Fill Equipment
-//     cy.fixture("AgentApp/NonFleet/equipmentVinData").then((vinData) => {
-//       equipmentVins = vinData.vinNumbers;
+    // Fill Equipment
+    cy.fixture("AgentApp/NonFleet/equipmentVinData").then((vinData) => {
+      equipmentVins = vinData.vinNumbers;
 
-//       EquipmentPage.fillAllEquipmentRowsAndProceed(
-//         vinData.vinNumbers,
-//         TestData.nonFleet.equipmentStatedValue
-//       );
-//     });
+      EquipmentPage.fillAllEquipmentRowsAndProceed(
+        vinData.vinNumbers,
+        TestData.nonFleet.equipmentStatedValue
+      );
+    });
 
-//     // Drivers Negative Validation
-//     DriversPage.verifyProceedBlockedWithoutData();
+    // Drivers Negative Validation
+    DriversPage.verifyProceedBlockedWithoutData();
 
-//     // Fill Drivers
-//     cy.fixture("AgentApp/NonFleet/driversCdlData").then((cdlData) => {
-//       driversCdlNumbers = cdlData.drivers.map(
-//         (d) => d.cdlNumber
-//       );
+    // Fill Drivers
+    cy.fixture("AgentApp/NonFleet/driversCdlData").then((cdlData) => {
+      driversCdlNumbers = cdlData.drivers.map(
+        (d) => d.cdlNumber
+      );
 
-//       DriversPage.fillAllDriverRowsAndProceed(
-//         cdlData.drivers,
-//         () => DataGenerator.getRandomDobForDriver(),
-//         () => DataGenerator.getRandomDateOfHire()
-//       );
-//     });
+      DriversPage.fillAllDriverRowsAndProceed(
+        cdlData.drivers,
+        () => DataGenerator.getRandomDobForDriver(),
+        () => DataGenerator.getRandomDateOfHire()
+      );
+    });
 
-//     // Indication Negative Validation
-//     IndicationPage.verifyIndicationHeadingVisible();
-//     IndicationPage.verifyProceedBlockedWithoutTelematics();
+    // Indication Negative Validation
+    IndicationPage.verifyIndicationHeadingVisible();
+    IndicationPage.verifyProceedBlockedWithoutTelematics();
 
-//     // Verify Defaults
-//     IndicationPage.verifyDefaultDeductibleAndLimits(
-//       TestData.nonFleet.indication.defaultDeductible,
-//       TestData.nonFleet.indication.defaultLimits
-//     );
+    // Verify Defaults
+    IndicationPage.verifyDefaultDeductibleAndLimits(
+      TestData.nonFleet.indication.defaultDeductible,
+      TestData.nonFleet.indication.defaultLimits
+    );
 
-//     // Complete Indication
-//     IndicationPage.completeIndicationScreen(
-//       TestData.nonFleet.indication
-//     ).then((capturedPlan) => {
-//       selectedPlanName = capturedPlan;
-//     });
+    // Complete Indication
+    IndicationPage.completeIndicationScreen(
+      TestData.nonFleet.indication
+    ).then((capturedPlan) => {
+      selectedPlanName = capturedPlan;
+    });
 
-//     // Review Page
-//     ReviewPage.verifyReviewHeadingVisible();
+    // Review Page
+    ReviewPage.verifyReviewHeadingVisible();
 
-//     ReviewPage.verifyOperationsSection({
-//       effectiveDate: insuredDetails.effectiveDate,
-//       producer: insuredDetails.producer,
-//       businessOwnerName: `${operationsData.firstName} ${operationsData.lastName}`,
-//       primaryOperatingClass: selectedOperatingClass,
-//       farthestRadius: operationsData.farthestRadiusOption,
-//       allClaims: operationsData.allClaimsCount,
-//       primaryCommodity: TestData.nonFleet.review.primaryCommodity,
-//     });
+    ReviewPage.verifyOperationsSection({
+      effectiveDate: insuredDetails.effectiveDate,
+      producer: insuredDetails.producer,
+      businessOwnerName: `${operationsData.firstName} ${operationsData.lastName}`,
+      primaryOperatingClass: selectedOperatingClass,
+      farthestRadius: operationsData.farthestRadiusOption,
+      allClaims: operationsData.allClaimsCount,
+      primaryCommodity: TestData.nonFleet.review.primaryCommodity,
+    });
 
-//     ReviewPage.verifyEquipmentSection(equipmentVins);
+    ReviewPage.verifyEquipmentSection(equipmentVins);
 
-//     ReviewPage.verifyDriversSection(driversCdlNumbers);
+    ReviewPage.verifyDriversSection(driversCdlNumbers);
 
-//     ReviewPage.verifyIndicationSection({
-//       deductibleValue: TestData.nonFleet.indication.deductibleOption,
-//       limitsValue: TestData.nonFleet.indication.limitsOption,
-//       telematicsEmail: Cypress.env("agentEmail"),
-//       planName: selectedPlanName,
-//     });
+    ReviewPage.verifyIndicationSection({
+      deductibleValue: TestData.nonFleet.indication.deductibleOption,
+      limitsValue: TestData.nonFleet.indication.limitsOption,
+      telematicsEmail: Cypress.env("agentEmail"),
+      planName: selectedPlanName,
+    });
 
-//     // Submit Application
-//     ReviewPage.submitAndVerifySuccess();
+    // Submit Application
+    ReviewPage.submitAndVerifySuccess();
 
-//     // Logout
-//     DashboardPage.verifyAgentNameVisible(expectedName);
-//     DashboardPage.logout();
+    // Logout
+    DashboardPage.verifyAgentNameVisible(expectedName);
+    DashboardPage.logout();
 
-//     cy.url().should("include", "/login");
-//   });
-// });
+    cy.url().should("include", "/login");
+  });
+});
