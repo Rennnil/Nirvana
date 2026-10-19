@@ -1,20 +1,19 @@
-import LoginPage from "../../../pages/AgentApp/NonFleet/LoginPage";
-import DashboardPage from "../../../pages/AgentApp/NonFleet/DashboardPage";
-import InsuredDetailsPage from "../../../pages/AgentApp/NonFleet/InsuredDetailsPage";
-import DataGenerator from "../../../support/utils/DataGenerator";
-import OperationsPage from "../../../pages/AgentApp/NonFleet/OperationsPage";
-import EquipmentPage from "../../../pages/AgentApp/NonFleet/EquipmentPage";
-import DriversPage from "../../../pages/AgentApp/NonFleet/DriversPage";
-import IndicationPage from "../../../pages/AgentApp/NonFleet/IndicationPage";
-import ReviewPage from "../../../pages/AgentApp/NonFleet/ReviewPage";
-import TestData from "../../../testData/TestData";
-import ApiEndpoints from "../../Assertions/ApiEndpoints";
+import DashboardPage from "../../pages/AgentApp/NonFleet/DashboardPage";
+import InsuredDetailsPage from "../../pages/AgentApp/NonFleet/InsuredDetailsPage";
+import DataGenerator from "../../support/utils/DataGenerator";
+import OperationsPage from "../../pages/AgentApp/NonFleet/OperationsPage";
+import EquipmentPage from "../../pages/AgentApp/NonFleet/EquipmentPage";
+import DriversPage from "../../pages/AgentApp/NonFleet/DriversPage";
+import IndicationPage from "../../pages/AgentApp/NonFleet/IndicationPage";
+import ReviewPage from "../../pages/AgentApp/NonFleet/ReviewPage";
+import TestData from "../../testData/TestData";
+import ApiEndpoints from "../../support/api/ApiEndpoints";
 import ApiAssertions from "../../Assertions/ApiAssertions";
 
 describe("Nirvana Agent Portal - Non-Fleet Flow (API Verification)", () => {
     const email = Cypress.env("agentEmail");
     const password = Cypress.env("agentPassword");
-    const expectedName = Cypress.env("agentName");
+    const expectedName = "Super Test";
     const category = TestData.nonFleet.category;
 
     let operationsData = {};
@@ -25,7 +24,7 @@ describe("Nirvana Agent Portal - Non-Fleet Flow (API Verification)", () => {
     let selectedPlanName = "";
 
     before(() => {
-        cy.fixture("nonFleetInsuredData").then((fixtureData) => {
+        cy.fixture("AgentApp/NonFleet/nonFleetInsuredData").then((fixtureData) => {
             insuredDetails = {
                 ...fixtureData,
                 effectiveDate: DataGenerator.getCurrentFormattedDate(),
